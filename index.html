@@ -1,1018 +1,1083 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIEL — Red Científica Adventista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --midnight: #0a0f1e;
+    --navy: #0d1b3e;
+    --deep: #112244;
+    --gold: #c9a84c;
+    --gold-light: #e2c97e;
+    --gold-dim: rgba(201,168,76,0.15);
+    --cream: #f5f0e8;
+    --cream-dim: rgba(245,240,232,0.06);
+    --white: #faf9f7;
+    --text: #c8c4bc;
+    --text-dim: rgba(200,196,188,0.5);
+    --border: rgba(201,168,76,0.18);
+    --border-dim: rgba(255,255,255,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--midnight);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
 
-<!doctype html>
-<html lang="es" class="no-js">
-  <head>
-    
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      
-        <meta name="description" content="Adventist Repository for Institutional and Educational Literature — Red Científica Adventista">
-      
-      
-      
-        <link rel="canonical" href="https://upeu-infra.github.io/ariel/">
-      
-      
-      
-        <link rel="next" href="propuesta-ejecutiva/">
-      
-      
-        
-          <link rel="alternate" href="/ariel/" hreflang="es">
-        
-          <link rel="alternate" href="/ariel/en/" hreflang="en">
-        
-      
-      
-      <link rel="icon" href="assets/images/ariel-logo.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
-    
-    
-      
-        <title>ARIEL</title>
-      
-    
-    
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
-      
-        
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
-      
-      
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
 
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1.25rem 4rem;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(20px);
+    background: rgba(10,15,30,0.8);
+    border-bottom: 1px solid var(--border-dim);
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 0.75rem;
+    text-decoration: none;
+  }
+  .nav-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 500;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+  }
+  .nav-links { display: flex; gap: 2.5rem; }
+  .nav-links a {
+    color: var(--text-dim); text-decoration: none;
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold-light); }
 
-    
-    
-      
-    
-    
-      
-        
-        
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
-      
-    
-    
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
-    
-      
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    position: relative; overflow: hidden;
+    padding: 8rem 4rem 6rem;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(201,168,76,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 20% 80%, rgba(13,27,62,0.8) 0%, transparent 50%),
+                linear-gradient(165deg, var(--midnight) 0%, var(--navy) 50%, var(--midnight) 100%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 70% 70% at 60% 40%, black 0%, transparent 70%);
+  }
+  .hero-content {
+    position: relative; z-index: 1;
+    max-width: 680px;
+    animation: fadeUp 1.2s ease both;
+  }
+  .hero-eyebrow {
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .hero-eyebrow-line {
+    width: 40px; height: 1px; background: var(--gold); opacity: 0.6;
+  }
+  .hero-eyebrow-text {
+    font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); font-weight: 400;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.2rem, 7vw, 5.5rem);
+    font-weight: 300; line-height: 1.05;
+    color: var(--white);
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+  .hero-title em {
+    font-style: italic; color: var(--gold-light);
+  }
+  .hero-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; font-weight: 300; font-style: italic;
+    color: var(--text-dim); margin-bottom: 2rem;
+    letter-spacing: 0.02em;
+  }
+  .hero-desc {
+    font-size: 0.95rem; color: var(--text);
+    max-width: 520px; margin-bottom: 3rem;
+    line-height: 1.8;
+  }
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+  .btn-primary {
+    padding: 0.85rem 2rem;
+    background: var(--gold);
+    color: var(--midnight);
+    font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 500; text-decoration: none;
+    transition: all 0.2s; border: 1px solid var(--gold);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-primary:hover { background: var(--gold-light); border-color: var(--gold-light); }
+  .btn-secondary {
+    padding: 0.85rem 2rem;
+    background: transparent; color: var(--cream);
+    font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 400; text-decoration: none;
+    border: 1px solid var(--border);
+    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold-light); }
 
-    
-    
-  </head>
-  
-  
-    
-    
-      
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
-  
-    
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
-    <div data-md-component="skip">
-      
-        
-        <a href="#ariel" class="md-skip">
-          Saltar a contenido
-        </a>
-      
+  /* Hero right — verse */
+  .hero-verse {
+    position: absolute; right: 4rem; top: 50%;
+    transform: translateY(-50%);
+    max-width: 340px;
+    border-left: 2px solid var(--gold);
+    padding-left: 2rem;
+    animation: fadeUp 1.4s 0.3s ease both;
+    opacity: 0;
+    animation-fill-mode: forwards;
+  }
+  .hero-verse blockquote {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 1.15rem; font-weight: 300;
+    color: var(--cream); line-height: 1.6; margin-bottom: 1rem;
+  }
+  .hero-verse cite {
+    font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold); font-style: normal;
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    background: var(--deep);
+    border-top: 1px solid var(--border-dim);
+    border-bottom: 1px solid var(--border-dim);
+    padding: 3rem 4rem;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+  .stat-item { text-align: center; }
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem; font-weight: 300;
+    color: var(--gold-light); line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .stat-label {
+    font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* ── SECTION COMMON ── */
+  section { padding: 7rem 4rem; position: relative; }
+  .section-header { margin-bottom: 4rem; }
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+  }
+  .section-tag::before {
+    content: ''; display: block; width: 24px; height: 1px; background: var(--gold);
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 300; color: var(--white);
+    line-height: 1.15; letter-spacing: -0.01em;
+  }
+  .section-title em { font-style: italic; color: var(--gold-light); }
+
+  /* ── THE PROBLEM ── */
+  .problem { background: var(--midnight); }
+  .problem-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4rem; align-items: start;
+  }
+  .problem-text p {
+    font-size: 1rem; line-height: 1.85;
+    color: var(--text); margin-bottom: 1.5rem;
+  }
+  .problem-text p strong { color: var(--cream); font-weight: 500; }
+  .danger-box {
+    border: 1px solid rgba(220,60,60,0.3);
+    background: rgba(220,60,60,0.05);
+    padding: 1.5rem 1.75rem; margin-top: 2rem;
+  }
+  .danger-box .danger-label {
+    font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: #e05050; margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .danger-box p { font-size: 0.9rem; color: var(--text); }
+
+  .gap-visual {
+    position: relative;
+    display: flex; flex-direction: column; gap: 1.25rem;
+  }
+  .gap-bar-item { display: flex; align-items: center; gap: 1rem; }
+  .gap-bar-label {
+    font-size: 0.78rem; color: var(--text-dim);
+    width: 180px; flex-shrink: 0; text-align: right;
+  }
+  .gap-bar-track {
+    flex: 1; height: 8px; background: rgba(255,255,255,0.06);
+    position: relative; overflow: hidden;
+  }
+  .gap-bar-fill {
+    height: 100%; position: relative;
+    animation: barGrow 1.5s ease both;
+    animation-play-state: paused;
+  }
+  .gap-bar-fill.gold { background: var(--gold); }
+  .gap-bar-fill.red { background: #e05050; }
+  .gap-bar-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem; color: var(--text-dim); width: 48px;
+  }
+
+  /* ── SOLUTION / PYRAMID ── */
+  .solution { background: var(--navy); }
+  .pyramid-container {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 5rem; align-items: center;
+  }
+  .pyramid {
+    display: flex; flex-direction: column; gap: 0.5rem;
+    align-items: center;
+  }
+  .pyramid-layer {
+    border: 1px solid var(--border);
+    padding: 1rem 2rem;
+    text-align: center;
+    transition: all 0.25s;
+    cursor: default; position: relative;
+  }
+  .pyramid-layer:hover { border-color: var(--gold); background: var(--gold-dim); }
+  .pyramid-layer.hub {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.1);
+    width: 100%;
+  }
+  .pyramid-layer.level-1 { width: 80%; }
+  .pyramid-layer.level-2 { width: 60%; }
+  .pyramid-layer.level-3 { width: 40%; border-color: rgba(255,255,255,0.2); }
+  .pyramid-layer-label {
+    font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 0.25rem;
+  }
+  .pyramid-layer-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; color: var(--white);
+  }
+  .pyramid-layer.hub .pyramid-layer-name { color: var(--gold-light); font-size: 1.25rem; }
+  .pyramid-connector {
+    width: 1px; height: 12px; background: var(--border); margin: 0 auto;
+  }
+
+  .solution-features { display: flex; flex-direction: column; gap: 1.5rem; }
+  .feature-item {
+    display: flex; gap: 1.25rem;
+    padding: 1.25rem; border: 1px solid var(--border-dim);
+    transition: all 0.2s;
+  }
+  .feature-item:hover { border-color: var(--border); background: var(--cream-dim); }
+  .feature-icon {
+    width: 40px; height: 40px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border);
+    font-size: 1.1rem;
+  }
+  .feature-content h4 {
+    font-size: 0.85rem; letter-spacing: 0.05em;
+    color: var(--cream); margin-bottom: 0.3rem; font-weight: 500;
+  }
+  .feature-content p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; }
+
+  /* ── ROADMAP ── */
+  .roadmap { background: var(--midnight); }
+  .timeline {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0; position: relative;
+  }
+  .timeline::before {
+    content: ''; position: absolute;
+    top: 2.5rem; left: 2.5rem; right: 2.5rem; height: 1px;
+    background: linear-gradient(90deg, var(--gold) 0%, rgba(201,168,76,0.3) 100%);
+  }
+  .timeline-item { padding: 0 1.5rem; padding-top: 5rem; position: relative; }
+  .timeline-dot {
+    position: absolute; top: 2rem; left: 2.5rem;
+    width: 1.25rem; height: 1.25rem;
+    border: 2px solid var(--gold);
+    background: var(--midnight);
+    transform: translateX(-50%) rotate(45deg);
+  }
+  .timeline-item.active .timeline-dot { background: var(--gold); }
+  .timeline-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--gold);
+    letter-spacing: 0.1em; margin-bottom: 0.75rem;
+  }
+  .timeline-phase {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; color: var(--white);
+    margin-bottom: 0.75rem;
+  }
+  .timeline-items {
+    list-style: none; display: flex; flex-direction: column; gap: 0.4rem;
+  }
+  .timeline-items li {
+    font-size: 0.78rem; color: var(--text-dim);
+    padding-left: 1rem; position: relative;
+  }
+  .timeline-items li::before {
+    content: '—'; position: absolute; left: 0;
+    color: var(--gold); opacity: 0.4;
+  }
+
+  /* ── ARCHITECTURE ── */
+  .architecture { background: var(--deep); }
+  .phase-cards {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border-dim);
+  }
+  .phase-card {
+    background: var(--deep);
+    padding: 2.5rem 2rem;
+    transition: background 0.2s;
+  }
+  .phase-card:hover { background: rgba(201,168,76,0.04); }
+  .phase-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4rem; font-weight: 300; line-height: 1;
+    color: rgba(201,168,76,0.15); margin-bottom: 0.5rem;
+  }
+  .phase-year {
+    font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.75rem;
+  }
+  .phase-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem; color: var(--white); margin-bottom: 1rem;
+  }
+  .phase-tech {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--gold); background: var(--gold-dim);
+    padding: 0.25rem 0.6rem; margin-bottom: 1rem;
+  }
+  .phase-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.7; }
+
+  /* ── FUNDING ── */
+  .funding { background: var(--navy); }
+  .funding-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem; margin-bottom: 3rem;
+  }
+  .funding-card {
+    border: 1px solid var(--border-dim);
+    padding: 2rem;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .funding-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: var(--gold); opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .funding-card:hover { border-color: var(--border); }
+  .funding-card:hover::before { opacity: 1; }
+  .funding-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem; font-weight: 300;
+    color: var(--gold-light); margin-bottom: 0.25rem;
+  }
+  .funding-source {
+    font-size: 0.8rem; color: var(--cream); margin-bottom: 0.5rem; font-weight: 500;
+  }
+  .funding-type {
+    font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 0.75rem;
+  }
+  .funding-status {
+    display: inline-block;
+    font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.2rem 0.6rem; border: 1px solid;
+  }
+  .funding-status.open { color: #5ec970; border-color: rgba(94,201,112,0.3); background: rgba(94,201,112,0.05); }
+  .funding-status.pending { color: #e0a030; border-color: rgba(224,160,48,0.3); background: rgba(224,160,48,0.05); }
+  .funding-status.future { color: var(--text-dim); border-color: var(--border-dim); }
+
+  /* ── ACTORS ── */
+  .actors { background: var(--midnight); }
+  .actors-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  .actor-card {
+    border: 1px solid var(--border-dim);
+    padding: 2rem 1.5rem; text-align: center;
+    transition: all 0.25s;
+  }
+  .actor-card:hover { border-color: var(--border); transform: translateY(-4px); }
+  .actor-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+  .actor-role {
+    font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.5rem;
+  }
+  .actor-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; color: var(--white); margin-bottom: 0.5rem;
+  }
+  .actor-desc { font-size: 0.78rem; color: var(--text-dim); line-height: 1.6; }
+
+  /* ── NEXT STEPS ── */
+  .nextsteps { background: var(--deep); }
+  .steps-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .step-item {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: 1.25rem; border: 1px solid var(--border-dim);
+    transition: border-color 0.2s;
+  }
+  .step-item:hover { border-color: var(--border); }
+  .step-check {
+    width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px;
+    border: 1px solid; display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem;
+  }
+  .step-check.done { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+  .step-check.todo { border-color: var(--border-dim); color: transparent; }
+  .step-text { font-size: 0.85rem; color: var(--text); }
+  .step-text strong { color: var(--cream); font-weight: 500; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--midnight);
+    border-top: 1px solid var(--border-dim);
+    padding: 3rem 4rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem; font-weight: 300; color: var(--gold-light);
+    letter-spacing: 0.08em;
+  }
+  .footer-tagline {
+    font-style: italic; font-size: 0.85rem;
+    color: var(--text-dim); margin-top: 0.25rem;
+  }
+  .footer-info {
+    text-align: right; font-size: 0.78rem; color: var(--text-dim); line-height: 1.8;
+  }
+  .footer-info a { color: var(--gold); text-decoration: none; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes barGrow {
+    from { width: 0; }
+    to { width: var(--target-width); }
+  }
+  .reveal {
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 60px; height: 1px; background: var(--gold);
+    opacity: 0.4; margin: 2rem 0;
+  }
+
+  /* ── REFERENCES ── */
+  .ref {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--gold);
+    background: var(--gold-dim);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 2px;
+    padding: 0 0.3rem;
+    vertical-align: super;
+    text-decoration: none;
+    margin-left: 2px;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .ref:hover { background: rgba(201,168,76,0.28); }
+  .ref-list {
+    margin-top: 3rem; padding-top: 2rem;
+    border-top: 1px solid var(--border-dim);
+  }
+  .ref-list-title {
+    font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .ref-list-title::before { content:''; display:block; width:18px; height:1px; background:var(--gold); }
+  .ref-entries { display: flex; flex-direction: column; gap: 0.5rem; }
+  .ref-entry {
+    font-size: 0.75rem; color: var(--text-dim);
+    display: flex; gap: 0.75rem; line-height: 1.5;
+  }
+  .ref-entry .ref-num {
+    font-family: 'DM Mono', monospace;
+    color: var(--gold); flex-shrink: 0; font-size: 0.68rem;
+  }
+  .ref-entry a { color: var(--gold); text-decoration: none; }
+  .ref-entry a:hover { text-decoration: underline; }
+  .funding-link {
+    display: block; margin-top: 0.75rem;
+    font-size: 0.72rem; color: var(--gold);
+    text-decoration: none; letter-spacing: 0.04em;
+    opacity: 0.8; transition: opacity 0.15s;
+    font-family: 'DM Mono', monospace;
+  }
+  .funding-link:hover { opacity: 1; text-decoration: underline; }
+  .funding-link::before { content: '↗ '; }
+
+  @media (max-width: 1100px) {
+    nav { padding: 1.25rem 2rem; }
+    .hero { padding: 8rem 2rem 6rem; }
+    .hero-verse { display: none; }
+    section { padding: 5rem 2rem; }
+    .stats-bar { padding: 2rem; grid-template-columns: repeat(2, 1fr); }
+    .problem-grid, .pyramid-container { grid-template-columns: 1fr; gap: 3rem; }
+    .phase-cards { grid-template-columns: 1fr; }
+    .funding-grid { grid-template-columns: repeat(2, 1fr); }
+    .actors-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps-grid { grid-template-columns: 1fr; }
+    .timeline { grid-template-columns: repeat(2, 1fr); }
+    footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+    .footer-info { text-align: center; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">
+    <span class="nav-name">ARIEL</span>
+  </a>
+  <div class="nav-links">
+    <a href="#problem">El Problema</a>
+    <a href="#solution">La Solución</a>
+    <a href="#roadmap">Hoja de Ruta</a>
+    <a href="#funding">Financiamiento</a>
+    <a href="#nextsteps">Próximos Pasos</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      <span class="hero-eyebrow-text">Adventist Repository for Institutional and Educational Literature</span>
     </div>
-    <div data-md-component="announce">
-      
+    <h1 class="hero-title">
+      Red Científica<br><em>Adventista</em><br>Global
+    </h1>
+    <p class="hero-subtitle">Segunda mayor red educativa privada del mundo. Cero infraestructura digital compartida.</p>
+    <p class="hero-desc">ARIEL es la red federada de repositorios institucionales de las universidades adventistas — el equivalente denominacional de lo que OpenAIRE hace por Europa o LA Referencia por Latinoamérica.</p>
+    <div class="hero-cta">
+      <a href="#solution" class="btn-primary">Ver la Solución</a>
+      <a href="#funding" class="btn-secondary">Financiamiento</a>
     </div>
-    
-    
-      
+  </div>
+  <div class="hero-verse">
+    <blockquote>"En aquel día los sordos oirán las palabras del libro, y los ojos de los ciegos verán desde la oscuridad y las tinieblas."</blockquote>
+    <cite>— Isaías 29:18</cite>
+  </div>
+</section>
 
-  
+<!-- STATS -->
+<div class="stats-bar reveal">
+  <div class="stat-item">
+    <div class="stat-number">118+</div>
+    <div class="stat-label">Universidades en 50+ países <a href="https://www.adventist.education/education-statistics/" target="_blank" class="ref">1</a></div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">163K</div>
+    <div class="stat-label">Estudiantes nivel terciario <a href="https://www.adventist.education/education-statistics/" target="_blank" class="ref">1</a></div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">15K</div>
+    <div class="stat-label">Publicaciones anuales (est.) <a href="https://upeu-infra.github.io/ariel/literatura/" target="_blank" class="ref">2</a></div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">&lt;5%</div>
+    <div class="stat-label">Con repositorio operativo <a href="https://upeu-infra.github.io/ariel/literatura/" target="_blank" class="ref">2</a></div>
+  </div>
+</div>
 
-<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Cabecera">
-    <a href="." title="ARIEL" class="md-header__button md-logo" aria-label="ARIEL" data-md-component="logo">
-      
-  <img src="assets/images/ariel-logo.svg" alt="logo">
-
-    </a>
-    <label class="md-header__button md-icon" for="__drawer">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
-    </label>
-    <div class="md-header__title" data-md-component="header-title">
-      <div class="md-header__ellipsis">
-        <div class="md-header__topic">
-          <span class="md-ellipsis">
-            ARIEL
-          </span>
-        </div>
-        <div class="md-header__topic" data-md-component="header-topic">
-          <span class="md-ellipsis">
-            
-              Inicio
-            
-          </span>
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="section-header reveal">
+    <div class="section-tag">El Problema</div>
+    <h2 class="section-title">Una escala sin<br><em>infraestructura</em></h2>
+  </div>
+  <div class="problem-grid">
+    <div class="problem-text reveal">
+      <p>El sistema educativo adventista constituye el <strong>segundo mayor sistema educativo privado del mundo</strong> con 118+ universidades en más de 50 países.<a href="https://www.adventist.education/education-statistics/" target="_blank" class="ref">1</a> Sin embargo, menos del 5% cuenta con un repositorio institucional operativo y no existe ninguna red federada entre ellas.<a href="https://upeu-infra.github.io/ariel/literatura/" target="_blank" class="ref">2</a></p>
+      <p>Entre <strong>5,000 y 15,000 publicaciones académicas anuales</strong> son actualmente invisibles para Scopus, WoS, OpenAlex y para otros investigadores adventistas en cualquier parte del mundo.<a href="https://upeu-infra.github.io/ariel/literatura/" target="_blank" class="ref">2</a></p>
+      <p>El repositorio de Andrews University recibió visitas de <strong>191 países</strong> y superó el millón de descargas en sus primeros tres años de operación.<a href="https://www.nadadventist.org/news/millionth-download-digital-commons-andrews-university/" target="_blank" class="ref">3</a> Esto sugiere que actúa como repositorio de facto para toda la denominación — dado que la gran mayoría de universidades adventistas no tiene infraestructura propia, Andrews concentra la visibilidad de la producción académica global adventista en una sola institución.</p>
+      <div class="danger-box">
+        <div class="danger-label">⚠ Riesgo sistémico</div>
+        <p>Si Andrews University cambia su política o plataforma, la visibilidad de toda la producción científica adventista global colapsa. La producción de África, Asia y Latinoamérica no tiene plataforma propia.<a href="https://digitalcommons.andrews.edu/" target="_blank" class="ref">4</a></p>
+      </div>
+      <div class="ref-list">
+        <div class="ref-list-title">Referencias</div>
+        <div class="ref-entries">
+          <div class="ref-entry"><span class="ref-num">[1]</span><span>GC Education Dept. — <a href="https://www.adventist.education/education-statistics/" target="_blank">adventist.education/education-statistics</a>. Estadísticas de educación adventista mundial.</span></div>
+          <div class="ref-entry"><span class="ref-num">[2]</span><span>Revisión de literatura ARIEL — <a href="https://upeu-infra.github.io/ariel/literatura/" target="_blank">upeu-infra.github.io/ariel/literatura</a>. Análisis de brechas y repositorios adventistas confirmados.</span></div>
+          <div class="ref-entry"><span class="ref-num">[3]</span><span>NAD Adventist News — <a href="https://www.nadadventist.org/news/millionth-download-digital-commons-andrews-university/" target="_blank">nadadventist.org — Millionth Download</a>. Digital Commons Andrews University: un millón de descargas.</span></div>
+          <div class="ref-entry"><span class="ref-num">[4]</span><span>Andrews University Digital Commons — <a href="https://digitalcommons.andrews.edu/" target="_blank">digitalcommons.andrews.edu</a>. Repositorio principal adventista global.</span></div>
         </div>
       </div>
     </div>
-    
-      
-        <form class="md-header__option" data-md-component="palette">
-  
-    
-    
-    
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
-    
-      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
-      </label>
-    
-  
-    
-    
-    
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
-    
-      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
-      </label>
-    
-  
-</form>
-      
-    
-    
-      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
-    
-    
-      <div class="md-header__option">
-  <div class="md-select">
-    
-    <button class="md-header__button md-icon" aria-label="Seleccionar idioma">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
-    </button>
-    <div class="md-select__inner">
-      <ul class="md-select__list">
-        
-          <li class="md-select__item">
-            <a href="/ariel/" hreflang="es" class="md-select__link">
-              Español
-            </a>
-          </li>
-        
-          <li class="md-select__item">
-            <a href="/ariel/en/" hreflang="en" class="md-select__link">
-              English
-            </a>
-          </li>
-        
+    <div class="gap-visual reveal reveal-delay-1">
+      <div style="margin-bottom:2rem;">
+        <div class="section-tag" style="margin-bottom:1rem;">Brecha de adopción</div>
+        <div class="gap-bar-item">
+          <div class="gap-bar-label">Total universidades</div>
+          <div class="gap-bar-track"><div class="gap-bar-fill gold" style="--target-width:100%; width:0%"></div></div>
+          <div class="gap-bar-value">118+</div>
+        </div>
+        <div style="height:1rem"></div>
+        <div class="gap-bar-item">
+          <div class="gap-bar-label">Con repositorio activo</div>
+          <div class="gap-bar-track"><div class="gap-bar-fill red" style="--target-width:5%; width:0%"></div></div>
+          <div class="gap-bar-value">~6</div>
+        </div>
+      </div>
+      <div style="margin-top:3rem;">
+        <div class="section-tag" style="margin-bottom:0.5rem;">Comparación con redes equivalentes</div>
+        <div style="font-size:0.72rem; color:var(--text-dim); margin-bottom:1.5rem; font-style:italic;">Nº de instituciones fuente conectadas (repositorios / bibliotecas activas) — estimaciones aproximadas</div>
+        <!-- Column headers -->
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.75rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border-dim);">
+          <div style="width:180px; flex-shrink:0; text-align:right; font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim);">Red</div>
+          <div style="flex:1; font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim);">Cobertura relativa</div>
+          <div style="width:48px; font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim);">Inst.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div class="gap-bar-item">
+            <div class="gap-bar-label"><a href="https://www.openaire.eu/" target="_blank" style="color:var(--text-dim);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--text-dim)'">OpenAIRE</a></div>
+            <div class="gap-bar-track"><div class="gap-bar-fill gold" style="--target-width:100%; width:0%"></div></div>
+            <div class="gap-bar-value">2,209</div>
+          </div>
+          <div class="gap-bar-item">
+            <div class="gap-bar-label"><a href="https://www.beth.eu/" target="_blank" style="color:var(--text-dim);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--text-dim)'">BETH Teológica</a></div>
+            <div class="gap-bar-track"><div class="gap-bar-fill gold" style="--target-width:68%; width:0%"></div></div>
+            <div class="gap-bar-value">~1,500</div>
+          </div>
+          <div class="gap-bar-item">
+            <div class="gap-bar-label"><a href="https://www.lareferencia.info/es/" target="_blank" style="color:var(--text-dim);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--text-dim)'">LA Referencia</a></div>
+            <div class="gap-bar-track"><div class="gap-bar-fill gold" style="--target-width:4.5%; width:0%"></div></div>
+            <div class="gap-bar-value">~100</div>
+          </div>
+          <div class="gap-bar-item">
+            <div class="gap-bar-label"><a href="https://www.atla.com/learning-engagement/crra/" target="_blank" style="color:var(--text-dim);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--text-dim)'">CRRA Católica</a></div>
+            <div class="gap-bar-track"><div class="gap-bar-fill gold" style="--target-width:2.3%; width:0%"></div></div>
+            <div class="gap-bar-value">50</div>
+          </div>
+          <div class="gap-bar-item">
+            <div class="gap-bar-label" style="color:#e05050">Red Adventista hoy</div>
+            <div class="gap-bar-track"><div class="gap-bar-fill red" style="--target-width:0.27%; width:0%"></div></div>
+            <div class="gap-bar-value" style="color:#e05050">~6</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem; font-size:0.68rem; color:var(--text-dim); font-style:italic;">* Cifras aproximadas. BETH incluye bibliotecas teológicas de todas las denominaciones. LA Referencia: 10 países miembro, ~100 instituciones estimadas. CRRA se disolvió en 2023 y migró a Atla.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution" id="solution">
+  <div class="section-header reveal">
+    <div class="section-tag">La Solución</div>
+    <h2 class="section-title">ARIEL — el hub<br><em>que falta</em></h2>
+  </div>
+  <div class="pyramid-container">
+    <div class="pyramid reveal">
+      <div class="pyramid-layer level-3">
+        <div class="pyramid-layer-label">Indexadores globales</div>
+        <div class="pyramid-layer-name">OpenAIRE · BASE · OpenAlex</div>
+      </div>
+      <div class="pyramid-connector"></div>
+      <div class="pyramid-layer level-2">
+        <div class="pyramid-layer-label">Red LATAM</div>
+        <div class="pyramid-layer-name">LA Referencia</div>
+      </div>
+      <div class="pyramid-connector"></div>
+      <div class="pyramid-layer hub">
+        <div class="pyramid-layer-label">⭐ Hub central</div>
+        <div class="pyramid-layer-name">ARIEL</div>
+      </div>
+      <div class="pyramid-connector"></div>
+      <div class="pyramid-layer level-2">
+        <div class="pyramid-layer-label">Redes nacionales</div>
+        <div class="pyramid-layer-name">ALICIA · BDTD · SNRD · RRAAE</div>
+      </div>
+      <div class="pyramid-connector"></div>
+      <div class="pyramid-layer level-3">
+        <div class="pyramid-layer-label">Nodos institucionales</div>
+        <div class="pyramid-layer-name">DSpace / OJS en cada universidad</div>
+      </div>
+    </div>
+    <div class="solution-features reveal reveal-delay-1">
+      <div class="feature-item">
+        <div class="feature-icon">📚</div>
+        <div class="feature-content">
+          <h4>DSpace — Repositorios institucionales</h4>
+          <p>Tesis, artículos, reportes. Vía OAI-PMH nativo. Núcleo del proyecto. <a href="https://dspace.lyrasis.org/" target="_blank" class="ref">5</a></p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📰</div>
+        <div class="feature-content">
+          <h4>OJS — Revistas académicas adventistas</h4>
+          <p>Muchas ya existen con OAI-PMH nativo. Integración directa. <a href="https://pkp.sfu.ca/software/ojs/" target="_blank" class="ref">6</a></p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🌐</div>
+        <div class="feature-content">
+          <h4>Hub — InvenioRDM (Fase 1)</h4>
+          <p>Desarrollado por CERN, usado por Zenodo. Docker Compose, UI moderna, OAI-PMH nativo. Open source MIT. <a href="https://inveniordm.docs.cern.ch/" target="_blank" class="ref">7</a></p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔬</div>
+        <div class="feature-content">
+          <h4>DSpace-CRIS — Entidades de investigación (Fase 3)</h4>
+          <p>Investigadores, proyectos y financiamiento. Cuando DSpace 10 madure. <a href="https://dspace.org/dspace-cris/" target="_blank" class="ref">8</a></p>
+        </div>
+      </div>
+      <div class="feature-item" style="border-color: rgba(201,168,76,0.2); background: rgba(201,168,76,0.03);">
+        <div class="feature-icon">✅</div>
+        <div class="feature-content">
+          <h4>Schema unificador: OpenAIRE Guidelines v4</h4>
+          <p>Compatible con CERIF, Dublin Core y DataCite. Cumple reguladores nacionales simultáneamente. <a href="https://guidelines.openaire.eu/en/latest/" target="_blank" class="ref">9</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="roadmap" id="roadmap">
+  <div class="section-header reveal">
+    <div class="section-tag">Hoja de Ruta</div>
+    <h2 class="section-title">Expansión<br><em>por fases</em></h2>
+  </div>
+  <div class="timeline reveal">
+    <div class="timeline-item active">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2026</div>
+      <div class="timeline-phase">Piloto SAD</div>
+      <ul class="timeline-items">
+        <li>5–10 universidades sudamericanas</li>
+        <li>DSpace + OJS federados</li>
+        <li>Registro en OpenDOAR</li>
+        <li>InvenioRDM como hub</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2027</div>
+      <div class="timeline-phase">SAD + IAD</div>
+      <ul class="timeline-items">
+        <li>20+ instituciones activas</li>
+        <li>Integración LA Referencia</li>
+        <li>Política OA denominacional</li>
+        <li>Upgrade a DSpace-CRIS hub</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2028</div>
+      <div class="timeline-phase">Expansión global</div>
+      <ul class="timeline-items">
+        <li>Todas las divisiones IASD</li>
+        <li>DSpace-CRIS / CERIF</li>
+        <li>OpenAIRE Guidelines v4</li>
+        <li>OpenAIRE Graph stack</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2030</div>
+      <div class="timeline-phase">Red madura</div>
+      <ul class="timeline-items">
+        <li>100+ instituciones</li>
+        <li>500,000+ registros</li>
+        <li>Hub global adventista</li>
+        <li>Sostenibilidad SCOSS</li>
       </ul>
     </div>
   </div>
-</div>
-    
-    
-      
-      
-        <label class="md-header__button md-icon" for="__search">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        </label>
-        <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
-      <label class="md-search__icon md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Buscar">
-        
-        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-      </nav>
-      
-        <div class="md-search__suggest" data-md-component="search-suggest"></div>
-      
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
-            Inicializando búsqueda
-          </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="architecture" id="architecture">
+  <div class="section-header reveal">
+    <div class="section-tag">Arquitectura Técnica</div>
+    <h2 class="section-title">Stack tecnológico<br><em>por fase</em></h2>
+  </div>
+  <div class="phase-cards reveal">
+    <div class="phase-card">
+      <div class="phase-number">01</div>
+      <div class="phase-year">Fase 1 — 2026</div>
+      <div class="phase-name">InvenioRDM</div>
+      <div class="phase-tech">AWS · EC2 t3.xlarge · S3 · PostgreSQL</div>
+      <p class="phase-desc">Desarrollado por CERN, usado por Zenodo y TU Graz.<a href="https://inveniordm.docs.cern.ch/" target="_blank" class="ref">7</a> Docker Compose — stack conocido. UI moderna. OAI-PMH nativo incorporado. Open source MIT. El más rápido de desplegar para el piloto.</p>
+    </div>
+    <div class="phase-card">
+      <div class="phase-number">02</div>
+      <div class="phase-year">Fase 2 — 2027</div>
+      <div class="phase-name">DSpace-CRIS Hub</div>
+      <div class="phase-tech">Cuando DSpace 10 madure</div>
+      <p class="phase-desc">Cero impedancia de schema: cada nodo expone entidades CRIS completas.<a href="https://dspace.org/dspace-cris/" target="_blank" class="ref">8</a> Permite construir el <em>grafo de conocimiento adventista</em>: quién investiga qué, con qué fondos, en qué institución.</p>
+    </div>
+    <div class="phase-card">
+      <div class="phase-number">03</div>
+      <div class="phase-year">Fase 3 — 2028+</div>
+      <div class="phase-name">OpenAIRE Graph Stack</div>
+      <div class="phase-tech">CERIF nativo · Escala continental</div>
+      <p class="phase-desc">CERIF nativo probado a escala continental. Integración directa con OpenAIRE (193M registros),<a href="https://graph.openaire.eu/" target="_blank" class="ref">10</a> LA Referencia (5M registros)<a href="https://www.lareferencia.info/es/" target="_blank" class="ref">11</a> y OpenAlex.<a href="https://openalex.org/" target="_blank" class="ref">12</a> Conecta todas las divisiones IASD globalmente.</p>
     </div>
   </div>
-</div>
-      
-    
-    
-      <div class="md-header__source">
-        <a href="https://github.com/UPeU-Infra/ariel" title="Ir al repositorio" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+</section>
+
+<!-- FUNDING -->
+<section class="funding" id="funding">
+  <div class="section-header reveal">
+    <div class="section-tag">Financiamiento</div>
+    <h2 class="section-title">Pipeline de<br><em>financiamiento</em></h2>
   </div>
-  <div class="md-source__repository">
-    UPeU-Infra/ariel
-  </div>
-</a>
-      </div>
-    
-  </nav>
-  
-    
-      
-<nav class="md-tabs" aria-label="Pestañas" data-md-component="tabs">
-  <div class="md-grid">
-    <ul class="md-tabs__list">
-      
-        
-  
-  
-  
-    
-  
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="." class="md-tabs__link">
-        
-  
-  
-    
-  
-  Inicio
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="propuesta-ejecutiva/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Propuesta Ejecutiva
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="arquitectura/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Arquitectura
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="financiamiento/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Financiamiento
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="literatura/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Literatura
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="contexto/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Contexto
-
-      </a>
-    </li>
-  
-
-      
-    </ul>
-  </div>
-</nav>
-    
-  
-</header>
-    
-    <div class="md-container" data-md-component="container">
-      
-      
-        
-      
-      <main class="md-main" data-md-component="main">
-        <div class="md-main__inner md-grid">
-          
-            
-              
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-
-  
-
-
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegación" data-md-level="0">
-  <label class="md-nav__title" for="__drawer">
-    <a href="." title="ARIEL" class="md-nav__button md-logo" aria-label="ARIEL" data-md-component="logo">
-      
-  <img src="assets/images/ariel-logo.svg" alt="logo">
-
-    </a>
-    ARIEL
-  </label>
-  
-    <div class="md-nav__source">
-      <a href="https://github.com/UPeU-Infra/ariel" title="Ir al repositorio" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
-  </div>
-  <div class="md-source__repository">
-    UPeU-Infra/ariel
-  </div>
-</a>
+  <div class="funding-grid">
+    <div class="funding-card reveal">
+      <div class="funding-amount">$30K–$100K</div>
+      <div class="funding-source">WillPlan Mission Impact Fund</div>
+      <div class="funding-type">GC-IASD · No reembolsable</div>
+      <span class="funding-status open">Abierto — Deadline mayo 2027</span>
+      <a href="https://www.willplan.org/services/missionimpactfund/" target="_blank" class="funding-link">willplan.org/services/missionimpactfund</a>
     </div>
-  
-  <ul class="md-nav__list" data-md-scrollfix>
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inicio
-  
+    <div class="funding-card reveal reveal-delay-1">
+      <div class="funding-amount">Hasta $1.5M</div>
+      <div class="funding-source">IOI Fund for Network Adoption</div>
+      <div class="funding-type">Invest in Open Infrastructure</div>
+      <span class="funding-status pending">Próx. conv. 2026–2027</span>
+      <a href="https://investinopen.org/blog/invest-in-open-infrastructure-announces-us-500-000-contribution-from-lyrasis-for-the-ioi-fund-for-network-adoption/" target="_blank" class="funding-link">investinopen.org — Network Adoption Fund</a>
+    </div>
+    <div class="funding-card reveal reveal-delay-2">
+      <div class="funding-amount">$250K–$500K</div>
+      <div class="funding-source">Mellon Foundation</div>
+      <div class="funding-type">Higher Learning Program</div>
+      <span class="funding-status future">Ciclo 2027</span>
+      <a href="https://mellon.org/programs/higher-learning/" target="_blank" class="funding-link">mellon.org/programs/higher-learning</a>
+    </div>
+    <div class="funding-card reveal">
+      <div class="funding-amount">Por confirmar</div>
+      <div class="funding-source">División Sudamericana (SAD)</div>
+      <div class="funding-type">Fondo TI / Educación · Co-financiador</div>
+      <span class="funding-status pending">Negociación institucional</span>
+      <a href="https://www.adventistas.org/es/institucional/organizacion/divisiones-de-la-asociacion-general/division-sudamericana/" target="_blank" class="funding-link">adventistas.org — División Sudamericana</a>
+    </div>
+    <div class="funding-card reveal reveal-delay-1">
+      <div class="funding-amount">Recurrente</div>
+      <div class="funding-source">SCOSS</div>
+      <div class="funding-type">Global Sustainability Coalition for OA Services</div>
+      <span class="funding-status future">Fase 3 — 50+ instituciones</span>
+      <a href="https://scoss.org/" target="_blank" class="funding-link">scoss.org</a>
+    </div>
+    <div class="funding-card reveal reveal-delay-2" style="border-color: rgba(201,168,76,0.2); background: rgba(201,168,76,0.03);">
+      <div class="funding-amount" style="font-size:1.1rem; font-family:'DM Sans'">Precedente directo</div>
+      <div class="funding-source">LA Referencia ← $1.5M IOI Fund</div>
+      <div class="funding-type">Ciclo inaugural 2025 — Modelo exacto para ARIEL</div>
+      <span class="funding-status open">ARIEL replica este modelo</span>
+      <a href="https://www.lareferencia.info/es/" target="_blank" class="funding-link">lareferencia.info</a>
+    </div>
+  </div>
+</section>
 
-    
-  </span>
-  
-  
+<!-- ACTORS -->
+<section class="actors">
+  <div class="section-header reveal">
+    <div class="section-tag">Actores y Roles</div>
+    <h2 class="section-title">Quiénes hacen<br><em>posible ARIEL</em></h2>
+  </div>
+  <div class="actors-grid">
+    <div class="actor-card reveal">
+      <div class="actor-icon">🏛️</div>
+      <div class="actor-role">Institución Promotora</div>
+      <div class="actor-name">UPeU</div>
+      <p class="actor-desc">Universidad Peruana Unión, Lima. DSpace activo aprobado por ALICIA 2021. Líder institucional del proyecto. <a href="https://repositorio.upeu.edu.pe/" target="_blank" class="ref">13</a></p>
+    </div>
+    <div class="actor-card reveal reveal-delay-1">
+      <div class="actor-icon">⚙️</div>
+      <div class="actor-role">Socio Tecnológico</div>
+      <div class="actor-name">IATec</div>
+      <p class="actor-desc">Instituto Adventista de Tecnología. Brazo tech oficial de la SAD. Opera en 40+ países. <a href="https://www.iatec.com/" target="_blank" class="ref">14</a></p>
+    </div>
+    <div class="actor-card reveal reveal-delay-2">
+      <div class="actor-icon">✝️</div>
+      <div class="actor-role">Respaldo Denominacional</div>
+      <div class="actor-name">División Sudamericana</div>
+      <p class="actor-desc">Endorsement institucional para 13 universidades adventistas sudamericanas. Canal directo hacia la Conferencia General. <a href="https://www.adventistas.org/es/institucional/organizacion/divisiones-de-la-asociacion-general/division-sudamericana/" target="_blank" class="ref">15</a></p>
+    </div>
+    <div class="actor-card reveal reveal-delay-3">
+      <div class="actor-icon">🛠️</div>
+      <div class="actor-role">Operador Técnico</div>
+      <div class="actor-name">UPeU · DTI · Infra</div>
+      <p class="actor-desc">Dirección de Tecnologías de Información de la Universidad Peruana Unión. Responsable del despliegue y mantenimiento del hub ARIEL y los nodos institucionales.</p>
+    </div>
+  </div>
+</section>
 
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inicio
-  
+<!-- NEXT STEPS -->
+<section class="nextsteps" id="nextsteps">
+  <div class="section-header reveal">
+    <div class="section-tag">Próximos Pasos</div>
+    <h2 class="section-title">Acciones<br><em>inmediatas</em></h2>
+  </div>
+  <div class="steps-grid">
+    <div class="step-item reveal">
+      <div class="step-check done">✓</div>
+      <div class="step-text"><strong>Nombre del proyecto definido</strong> — ARIEL, nombre oficial para todas las regiones</div>
+    </div>
+    <div class="step-item reveal reveal-delay-1">
+      <div class="step-check done">✓</div>
+      <div class="step-text"><strong>Revisión de literatura</strong> — Brecha documentada y validada</div>
+    </div>
+    <div class="step-item reveal reveal-delay-2">
+      <div class="step-check done">✓</div>
+      <div class="step-text"><strong>Arquitectura técnica</strong> — Stack definido por fase</div>
+    </div>
+    <div class="step-item reveal reveal-delay-3">
+      <div class="step-check done">✓</div>
+      <div class="step-text"><strong>Propuesta ejecutiva</strong> — Documento completo listo</div>
+    </div>
+    <div class="step-item reveal">
+      <div class="step-check todo"> </div>
+      <div class="step-text"><strong>Reunión DTI UPeU</strong> — Presentar propuesta al equipo directivo</div>
+    </div>
+    <div class="step-item reveal reveal-delay-1">
+      <div class="step-check todo"> </div>
+      <div class="step-text"><strong>Reunión IATec</strong> — Confirmar rol tecnológico e infraestructura</div>
+    </div>
+    <div class="step-item reveal reveal-delay-2">
+      <div class="step-check todo"> </div>
+      <div class="step-text"><strong>Endorsement División Sudamericana</strong> — Respaldo institucional formal</div>
+    </div>
+    <div class="step-item reveal reveal-delay-3">
+      <div class="step-check todo"> </div>
+      <div class="step-text"><strong>Inventario SAD</strong> — Universidades con DSpace/OJS activos</div>
+    </div>
+    <div class="step-item reveal">
+      <div class="step-check todo"> </div>
+      <div class="step-text"><strong>Adquirir dominio para ARIEL</strong> — Evaluación de opciones en proceso</div>
+    </div>
+    <div class="step-item reveal reveal-delay-1">
+      <div class="step-check todo"> </div>
+      <div class="step-text"><strong>WillPlan MIF 2027</strong> — Aplicar antes del 1 de mayo 2027</div>
+    </div>
+    <div class="step-item reveal reveal-delay-2">
+      <div class="step-check todo"> </div>
+      <div class="step-text"><strong>IOI Fund concept note</strong> — Preparar para convocatoria 2026–2027</div>
+    </div>
+    <div class="step-item reveal reveal-delay-3">
+      <div class="step-check todo"> </div>
+      <div class="step-text"><strong>Registro OpenDOAR</strong> — Registrar ARIEL como red internacional</div>
+    </div>
+  </div>
+</section>
 
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Tabla de contenidos
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#adventist-repository-for-institutional-and-educational-literature" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adventist Repository for Institutional and Educational Literature
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#que-es-ariel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ¿Qué es ARIEL?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#el-problema-que-resuelve" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        El problema que resuelve
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#la-solucion-piramide-de-agregacion-ariel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        La solución: pirámide de agregación ARIEL
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#escala-del-sistema-educativo-adventista" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Escala del sistema educativo adventista
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#fases-de-expansion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Fases de expansión
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#institucion-promotora" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Institución promotora
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="propuesta-ejecutiva/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Propuesta Ejecutiva
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="arquitectura/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Arquitectura
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="financiamiento/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Financiamiento
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="literatura/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Literatura
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="contexto/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contexto
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-  </ul>
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-            
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Tabla de contenidos
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#adventist-repository-for-institutional-and-educational-literature" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adventist Repository for Institutional and Educational Literature
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#que-es-ariel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ¿Qué es ARIEL?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#el-problema-que-resuelve" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        El problema que resuelve
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#la-solucion-piramide-de-agregacion-ariel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        La solución: pirámide de agregación ARIEL
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#escala-del-sistema-educativo-adventista" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Escala del sistema educativo adventista
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#fases-de-expansion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Fases de expansión
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#institucion-promotora" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Institución promotora
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-          
-          
-            <div class="md-content" data-md-component="content">
-              
-              <article class="md-content__inner md-typeset">
-                
-                  
-
-
-  
-  
-
-
-<h1 id="ariel">ARIEL</h1>
-<div class="hero">
-<h2 id="adventist-repository-for-institutional-and-educational-literature">Adventist Repository for Institutional and Educational Literature</h2>
-<p><em>Red global de repositorios científicos de las universidades e institutos de la Iglesia Adventista del Séptimo Día</em></p>
-<blockquote>
-<p><strong>ARIEL</strong> es un nombre propio — no se traduce. En español puede leerse como <em>"Repositorio Adventista de Investigación y Educación en Literatura"</em>, aunque el significado varía según el idioma de cada región. Como ocurre con OpenAIRE o ALICIA, el acrónimo es universal.</p>
-</blockquote>
-</div>
-<hr />
-<div class="admonition quote">
-<p class="admonition-title">Isaías 29:18</p>
-<p><em>"En aquel día los sordos oirán las palabras del libro, y los ojos de los ciegos verán desde la oscuridad y las tinieblas."</em></p>
-<p>Este versículo es el corazón de ARIEL. Un repositorio académico cuya función es hacer accesible el conocimiento que antes estaba sellado o invisible — <strong>es exactamente esa imagen</strong>.</p>
-</div>
-<hr />
-<h2 id="que-es-ariel">¿Qué es ARIEL?</h2>
-<p><strong>ARIEL</strong> es una red federada de repositorios institucionales de las universidades y centros de investigación de la Iglesia Adventista del Séptimo Día, iniciando con la <strong>División Sudamericana (SAD)</strong> y expandiéndose progresivamente a todas las divisiones del mundo.</p>
-<p>Es el equivalente adventista de lo que hace <a href="https://openaire.eu">OpenAIRE</a> para Europa o <a href="https://lareferencia.info">LA Referencia</a> para América Latina: <strong>agregar, unificar y dar visibilidad global a la producción científica adventista</strong>.</p>
-<hr />
-<h2 id="el-problema-que-resuelve">El problema que resuelve</h2>
-<pre class="mermaid"><code>graph TD
-    A["🏛️ 118+ universidades adventistas\nen 50+ países"] --&gt; B["⚠️ Problema"]
-    B --&gt; C["&lt; 5% tiene repositorio\ninstitucional operativo"]
-    B --&gt; D["Cero red federada\nentre instituciones"]
-    B --&gt; E["5,000–15,000 publicaciones/año\ninvisibles globalmente"]
-    B --&gt; F["Sin política denominacional\nde acceso abierto"]
-
-    style A fill:#1e3a5f,color:#fff
-    style B fill:#c0392b,color:#fff
-    style C fill:#e74c3c,color:#fff
-    style D fill:#e74c3c,color:#fff
-    style E fill:#e74c3c,color:#fff
-    style F fill:#e74c3c,color:#fff</code></pre>
-<hr />
-<h2 id="la-solucion-piramide-de-agregacion-ariel">La solución: pirámide de agregación ARIEL</h2>
-<pre class="mermaid"><code>graph BT
-    A["🏛️ DSpace / OJS\nen cada universidad adventista"] --&gt; B["🌎 Redes nacionales\nALICIA · BDTD · SNRD · RRAAE"]
-    B --&gt; C["⭐ HUB ARIEL\nariel.network"]
-    C --&gt; D["🌍 LA Referencia\nRed LATAM"]
-    D --&gt; E["🌐 OpenAIRE · BASE · CORE\nOpenAlex · Google Scholar"]
-
-    style C fill:#1e3a5f,color:#fff,stroke:#f39c12,stroke-width:3px
-    style A fill:#2980b9,color:#fff
-    style B fill:#27ae60,color:#fff
-    style D fill:#8e44ad,color:#fff
-    style E fill:#2c3e50,color:#fff</code></pre>
-<hr />
-<h2 id="escala-del-sistema-educativo-adventista">Escala del sistema educativo adventista</h2>
-<div class="grid cards">
-<ul>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M271.9 20.2c-9.8-5.6-21.9-5.6-31.8 0l-224 128c-12.6 7.2-18.8 22-15.1 36S17.5 208 32 208h32v208l-51.2 38.4C4.7 460.4 0 469.9 0 480c0 17.7 14.3 32 32 32h448c17.7 0 32-14.3 32-32 0-10.1-4.7-19.6-12.8-25.6L448 416V208h32c14.5 0 27.2-9.8 30.9-23.8s-2.5-28.8-15.1-36l-224-128zM400 208v208h-64V208zm-112 0v208h-64V208zm-112 0v208h-64V208zm80-112a32 32 0 1 1 0 64 32 32 0 1 1 0-64"/></svg></span> <strong>118+ universidades</strong></p>
-<p>En 50+ países — segundo sistema educativo privado del mundo</p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208M96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144M0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4C132 330.2 112 378.8 112 432v16c0 11.4 2.4 22.2 6.7 32H32c-17.7 0-32-14.3-32-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32v-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128v32c0 17.7-14.3 32-32 32zM472 160a72 72 0 1 1 144 0 72 72 0 1 1-144 0M160 432c0-88.4 71.6-160 160-160s160 71.6 160 160v16c0 17.7-14.3 32-32 32H192c-17.7 0-32-14.3-32-32z"/></svg></span> <strong>163,312 estudiantes</strong></p>
-<p>Nivel terciario generando tesis e investigación continuamente</p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M128 96c0-35.3 28.7-64 64-64h352c35.3 0 64 28.7 64 64v240h-96v-16c0-17.7-14.3-32-32-32h-64c-17.7 0-32 14.3-32 32v16H254.9c10.9-18.8 17.1-40.7 17.1-64 0-70.7-57.3-128-128-128-5.4 0-10.8.3-16 1zm205 352c-5.1-24.2-16.3-46.1-32.1-64H608c0 35.3-28.7 64-64 64zM64 272a80 80 0 1 1 160 0 80 80 0 1 1-160 0M0 480c0-53 43-96 96-96h96c53 0 96 43 96 96 0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32"/></svg></span> <strong>14,206 docentes</strong></p>
-<p>Potenciales investigadores y autores</p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M0 64C0 28.7 28.7 0 64 0h149.5c17 0 33.3 6.7 45.3 18.7l106.5 106.6c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64zm208-5.5V152c0 13.3 10.7 24 24 24h93.5zM120 256c-13.3 0-24 10.7-24 24s10.7 24 24 24h144c13.3 0 24-10.7 24-24s-10.7-24-24-24zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24h144c13.3 0 24-10.7 24-24s-10.7-24-24-24z"/></svg></span> <strong>5,000–15,000 publicaciones/año</strong></p>
-<p>Estimación conservadora — actualmente invisibles</p>
-</li>
-</ul>
-</div>
-<hr />
-<h2 id="fases-de-expansion">Fases de expansión</h2>
-<pre class="mermaid"><code>timeline
-    title Hoja de ruta ARIEL
-    2026 : Piloto SAD
-         : 5-10 universidades sudamericanas
-         : DSpace + OJS federados
-         : Registro OpenDOAR
-    2027 : SAD completa + IAD
-         : 20+ instituciones
-         : Integración LA Referencia
-         : Política OA denominacional
-    2028 : Expansión global
-         : Todas las divisiones
-         : DSpace-CRIS / CERIF
-         : OpenAIRE Guidelines v4
-    2030 : Red madura
-         : 100+ instituciones
-         : 500,000+ registros
-         : Hub global adventista</code></pre>
-<hr />
-<h2 id="institucion-promotora">Institución promotora</h2>
-<p><strong>Universidad Peruana Unión (UPeU)</strong> — Lima, Perú
-División Sudamericana de la Iglesia Adventista del Séptimo Día</p>
-<p><a class="md-button md-button--primary" href="propuesta-ejecutiva/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h370.7L297.3 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg></span> Ver Propuesta Ejecutiva</a>
-<a class="md-button" href="arquitectura/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h370.7L297.3 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg></span> Arquitectura Técnica</a></p>
-
-
-
-
-
-
-
-
-
-
-
-
-                
-              </article>
-            </div>
-          
-          
-  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
-
-<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
-        </div>
-        
-          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
-  Volver al principio
-</button>
-        
-      </main>
-      
-        <footer class="md-footer">
-  
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Pie" >
-        
-        
-          
-          <a href="propuesta-ejecutiva/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Propuesta Ejecutiva">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Siguiente
-              </span>
-              <div class="md-ellipsis">
-                Propuesta Ejecutiva
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
-    
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-copyright">
-  
-  
-    Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
-    </a>
-  
-</div>
-      
-        
-<div class="md-social">
-  
-    
-    
-    
-    
-      
-      
-    
-    <a href="https://github.com/UPeU-Infra/ariel" target="_blank" rel="noopener" title="github.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
-    </a>
-  
-</div>
-      
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">ARIEL</div>
+    <div class="footer-tagline">"En aquel día los sordos oirán las palabras del libro." — Isaías 29:18</div>
+  </div>
+  <div class="footer-info">
+    <div>Universidad Peruana Unión (UPeU) — Lima, Perú</div>
+    <div>División Sudamericana · Iglesia Adventista del Séptimo Día</div>
+    <div style="margin-top:0.5rem;">
+      <a href="https://upeu-infra.github.io/ariel">Documentación completa</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/UPeU-Infra/ariel">GitHub</a>
     </div>
   </div>
 </footer>
-      
-    </div>
-    <div class="md-dialog" data-md-component="dialog">
-      <div class="md-dialog__inner md-typeset"></div>
-    </div>
-    
-    
-    
-      
-      
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.code.copy", "content.tabs.link", "toc.follow", "announce.dismiss"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
-    
-    
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
-      
-    
-  </body>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Animate bars
+        entry.target.querySelectorAll('.gap-bar-fill').forEach(bar => {
+          const target = bar.style.getPropertyValue('--target-width');
+          bar.style.width = target;
+          bar.style.transition = 'width 1.5s ease';
+        });
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Nav active state
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (window.scrollY > 50) {
+      nav.style.background = 'rgba(10,15,30,0.95)';
+    } else {
+      nav.style.background = 'rgba(10,15,30,0.8)';
+    }
+  });
+</script>
+</body>
 </html>
