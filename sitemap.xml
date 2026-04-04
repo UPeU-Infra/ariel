@@ -2,132 +2,72 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
         <loc>https://upeu-infra.github.io/ariel/</loc>
-        <lastmod>2026-03-29</lastmod>
+        <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/"/>
     </url>
     <url>
         <loc>https://upeu-infra.github.io/ariel/arquitectura/</loc>
-        <lastmod>2026-03-29</lastmod>
+        <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/arquitectura/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/arquitectura/"/>
     </url>
     <url>
-        <loc>https://upeu-infra.github.io/ariel/contexto/</loc>
-        <lastmod>2026-03-29</lastmod>
+        <loc>https://upeu-infra.github.io/ariel/conectores/</loc>
+        <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/contexto/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/contexto/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/conectores/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/conectores/"/>
     </url>
     <url>
-        <loc>https://upeu-infra.github.io/ariel/financiamiento/</loc>
-        <lastmod>2026-03-29</lastmod>
+        <loc>https://upeu-infra.github.io/ariel/modelo-comercial/</loc>
+        <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/financiamiento/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/financiamiento/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/modelo-comercial/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/modelo-comercial/"/>
     </url>
     <url>
-        <loc>https://upeu-infra.github.io/ariel/implementacion-aws/</loc>
-        <lastmod>2026-03-29</lastmod>
+        <loc>https://upeu-infra.github.io/ariel/roadmap/</loc>
+        <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/implementacion-aws/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/implementacion-aws/"/>
-    </url>
-    <url>
-        <loc>https://upeu-infra.github.io/ariel/literatura/</loc>
-        <lastmod>2026-03-29</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/literatura/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/literatura/"/>
-    </url>
-    <url>
-        <loc>https://upeu-infra.github.io/ariel/plan-operativo/</loc>
-        <lastmod>2026-03-29</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/plan-operativo/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/plan-operativo/"/>
-    </url>
-    <url>
-        <loc>https://upeu-infra.github.io/ariel/propuesta-ejecutiva/</loc>
-        <lastmod>2026-03-29</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/propuesta-ejecutiva/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/propuesta-ejecutiva/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/roadmap/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/roadmap/"/>
     </url>
     <url>
         <loc>https://upeu-infra.github.io/ariel/en/</loc>
-        <lastmod>2026-03-29</lastmod>
+        <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/"/>
     </url>
     <url>
         <loc>https://upeu-infra.github.io/ariel/en/arquitectura/</loc>
-        <lastmod>2026-03-29</lastmod>
+        <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/arquitectura/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/arquitectura/"/>
     </url>
     <url>
-        <loc>https://upeu-infra.github.io/ariel/en/contexto/</loc>
-        <lastmod>2026-03-29</lastmod>
+        <loc>https://upeu-infra.github.io/ariel/en/conectores/</loc>
+        <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/contexto/"/>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/contexto/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/conectores/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/conectores/"/>
     </url>
     <url>
-        <loc>https://upeu-infra.github.io/ariel/en/financiamiento/</loc>
-        <lastmod>2026-03-29</lastmod>
+        <loc>https://upeu-infra.github.io/ariel/en/modelo-comercial/</loc>
+        <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/financiamiento/"/>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/financiamiento/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/modelo-comercial/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/modelo-comercial/"/>
     </url>
     <url>
-        <loc>https://upeu-infra.github.io/ariel/en/implementacion-aws/</loc>
-        <lastmod>2026-03-29</lastmod>
+        <loc>https://upeu-infra.github.io/ariel/en/roadmap/</loc>
+        <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/implementacion-aws/"/>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/implementacion-aws/"/>
-    </url>
-    <url>
-        <loc>https://upeu-infra.github.io/ariel/en/literatura/</loc>
-        <lastmod>2026-03-29</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/literatura/"/>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/literatura/"/>
-    </url>
-    <url>
-        <loc>https://upeu-infra.github.io/ariel/en/plan-operativo/</loc>
-        <lastmod>2026-03-29</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/plan-operativo/"/>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/plan-operativo/"/>
-    </url>
-    <url>
-        <loc>https://upeu-infra.github.io/ariel/en/propuesta-ejecutiva/</loc>
-        <lastmod>2026-03-29</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/propuesta-ejecutiva/"/>
-        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/propuesta-ejecutiva/"/>
-    </url>
-    <url>
-        <loc>https://upeu-infra.github.io/ariel/en/architecture/</loc>
-        <lastmod>2026-03-29</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/architecture/"/>
-    </url>
-    <url>
-        <loc>https://upeu-infra.github.io/ariel/en/executive-proposal/</loc>
-        <lastmod>2026-03-29</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/executive-proposal/"/>
-    </url>
-    <url>
-        <loc>https://upeu-infra.github.io/ariel/en/funding/</loc>
-        <lastmod>2026-03-29</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/funding/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/ariel/en/roadmap/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/ariel/roadmap/"/>
     </url>
 </urlset>
