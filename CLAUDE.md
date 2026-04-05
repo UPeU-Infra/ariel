@@ -221,6 +221,46 @@ class MidPointConnector(IdentityConnector):
     """Fase 1+: consulta midPoint REST API (usuario canonico)"""
 ```
 
+### Estandares y schemas de metadatos
+
+**Principio rector:** "Recolectar con amplitud, almacenar lo util, exponer lo requerido."
+
+| # | Estandar | Soportado | Fase | Modo | Complejidad |
+|---|---------|-----------|------|------|-------------|
+| 1 | Dublin Core (Qualified) | SI | 0 | Consumir + Exponer | Baja |
+| 2 | COAR Vocabularies (tipos, acceso) | SI | 0 | Consumir + almacenar como URIs | Baja |
+| 3 | ALICIA 2.1.0 / CONCYTEC (38 campos) | SI | 0 | Consumir | Baja |
+| 4 | RENATI / SUNEDU (namespace renati.*) | SI | 0 | Consumir | Baja |
+| 5 | OpenAIRE v3 (consumir de DSpace) | SI | 0 | Consumir (ya compatible) | Baja |
+| 6 | OpenAIRE v4 (exponer del Hub) | SI | 2 | Exponer (oai_openaire) | Media |
+| 7 | schema.org / JSON-LD | SI | 1 | Exponer en HTML del Hub | Baja |
+| 8 | DataCite | PARCIAL | 2 | Consumir (DOI, ORCID ya en modelo) | Media |
+| 9 | DRIVER Guidelines | NO | — | Solo tabla traduccion DRIVER→COAR | — |
+| 10 | CERIF | NO | 3+ | Solo si cliente tiene DSpace-CRIS | Alta |
+| 11 | VIVO | NO | — | Usar ORCID API en su lugar | Alta |
+| 12 | MODS / METS | NO | — | Overkill para RAG | Alta |
+| 13 | ETD-MS | PARCIAL | 0 | Ya cubierto por campos RENATI | Baja |
+
+**3 decisiones de diseno criticas:**
+1. **URIs COAR en el modelo interno, nunca strings.** No guardar "Tesis" — guardar `http://purl.org/coar/resource_type/c_db06`
+2. **Consumir `metadataPrefix=dim`** (DSpace Intermediate Metadata) ademas de `oai_dc`. Asi obtenemos campos `renati.*` y `thesis.*`
+3. **El abstract es el campo mas importante para RAG.** En Fase 0 sin GROBID, la calidad depende 100% de `dc.description.abstract`
+
+**11 campos OBLIGATORIOS universales de ALICIA 2.1.0:**
+`dc.contributor.author`, `dc.title`, `dc.publisher`, `dc.date.issued`, `dc.type` (URI COAR), `dc.language.iso`, `dc.rights` (URI COAR), `dc.description.abstract`, `dc.subject`, `dc.subject.ocde`, `dc.identifier.uri`
+
+**Campos adicionales para TESIS (RENATI):**
+`renati.author.dni`, `dc.contributor.advisor`, `renati.advisor.orcid`, `renati.type`, `thesis.degree.name`, `renati.level`, `thesis.degree.discipline`, `thesis.degree.grantor`, `renati.juror`
+
+### Orquestacion de equipo de desarrollo
+
+**Paperclip** (paperclip.ing) — plataforma open-source MIT para orquestar agentes AI como una empresa (org chart, presupuesto, auditoria). 47K+ GitHub stars.
+- **No para Fase 0:** Overkill para 1 desarrollador con <5 agentes
+- **Evaluar en Fase 2+:** Cuando GUIA tenga harvester + RAG + respuesta + monitoreo corriendo coordinadamente
+- **Sin lock-in:** MIT license, self-hosted, sin costo de plataforma (solo costo de API de LLMs)
+
+Para Fase 0-1: Claude Code + GitHub Issues/Projects es suficiente.
+
 ### Que NO se usa y por que
 
 | Descartado | Razon |

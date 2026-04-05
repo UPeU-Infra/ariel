@@ -98,6 +98,7 @@ extra:
 nav:
   - Inicio: index.md
   - Arquitectura: arquitectura.md
+  - Estandares: estandares.md
   - Modelo Comercial: modelo-comercial.md
   - Conectores: conectores.md
   - Roadmap: roadmap.md
