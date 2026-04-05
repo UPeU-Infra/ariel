@@ -126,47 +126,120 @@ GUIA es producto comercial de SciBack. El financiamiento puede venir de multiple
 
 ---
 
+## Modelo de despliegue: Hibrido (self-hosted + managed + SaaS)
+
+No es 100% SaaS ni 100% on-premise. Cada capa tiene su modelo:
+
+| Componente | Modelo | Razon |
+|-----------|--------|-------|
+| **GUIA Node** | **Self-hosted** o **SciBack-managed** | Datos sensibles (notas, deudas, expedientes) deben quedarse en infra de la universidad o en AWS dedicado. Necesita acceso a red interna (AD, SIS, ERP) |
+| **GUIA Hub** | **SaaS** (gestionado por SciBack) | Solo datos publicos de investigacion. Un Hub central sirve a N universidades |
+| **Keycloak** | **Co-desplegado con el Node** | Cada universidad tiene su realm. Va junto al Node |
+| **midPoint** | **Opcional, co-desplegado** | Solo para universidades con infra compleja (Tier Pro+) |
+
+### Variantes de deploy del Node
+
+| Variante | Para quien | Infra |
+|----------|-----------|-------|
+| **Self-hosted** | Universidades con DTI capaz y AWS/on-premise propio | Docker Compose en su EC2 o servidor fisico |
+| **SciBack-managed** | Universidades sin infra propia | SciBack despliega en AWS dedicado por cliente, con VPN o peering a la red interna de la universidad |
+| **Community** | Desarrolladores, pruebas | `docker compose up` local, solo Capa 1 Research |
+
+### Por que NO SaaS puro para el Node
+- Los datos campus (notas, deudas, matricula) son sensibles y regulados
+- El Node necesita acceso a AD/LDAP/SIS que estan en la red interna
+- Universidades latinoamericanas no confian en "mis datos en la nube de un tercero"
+- Latencia: el harvester debe estar cerca del DSpace/OJS local
+
+### Por que SI SaaS para el Hub
+- Solo agrega datos publicos de investigacion (ya estan en acceso abierto)
+- Un Hub central es mas eficiente que N Hubs independientes
+- SciBack controla la calidad y disponibilidad del servicio federado
+
+---
+
+## Decisiones tecnicas (abril 2026)
+
+### Stack definitivo del Node
+
+| Componente | Tecnologia | Licencia | Justificacion |
+|-----------|-----------|----------|---------------|
+| RAG engine | **LlamaIndex** (FunctionAgent + pgvector) | MIT | Mejor framework Python para RAG en produccion. Chunking, embeddings, reranking, hybrid search |
+| OAI-PMH harvester | **sickle** | BSD | Harvesting de DSpace/OJS. Probado, ligero |
+| PDF full-text | **GROBID** + grobid-client-python | Apache 2.0 | Estandar para papers academicos |
+| Vector store | **pgvector** (extension PostgreSQL) | MIT | Sin infraestructura adicional — usa el mismo Postgres |
+| API | **FastAPI** | MIT | REST + WebSocket. Async nativo |
+| Chat web (Fase 0) | **Chainlit** | Apache 2.0 | Chat funcional en 20 lineas Python |
+| Chat web (Fase 1+) | **React** widget embebible | — | Cuando necesitemos UI custom con branding por universidad |
+| Telegram bot | **aiogram** | MIT | Async, bien mantenido |
+| Dashboard | **Streamlit + Plotly** (Fase 0) → **Metabase** (Fase 1+) | MIT / AGPL | Visualizacion de produccion cientifica |
+| SSO/Auth | **Keycloak** | Apache 2.0 | OIDC provider, multi-tenant por realms |
+| IGA (Fase 1+) | **midPoint** | EUPL | Usuario canonico multi-fuente, lifecycle, gobernanza |
+| Deploy | **Docker Compose** | — | Un solo `docker compose up` |
+
+### Por que Python (y no otra cosa)
+
+- **Backend:** Obligatorio. LlamaIndex, GROBID client, sickle, aiogram — todo el ecosistema AI/ML es Python. No hay alternativa viable.
+- **Frontend:** Chainlit (Python) para Fase 0. React para Fase 1+ cuando haya UI custom.
+- Python NO es para el frontend final — es para el backend + RAG + agentes.
+
+### Framework de agentes
+
+| Fase | Capacidad | Herramienta |
+|------|-----------|-------------|
+| 0 | RAG simple (busqueda semantica) | LlamaIndex + pgvector |
+| 0.5 | FunctionAgent con tools (DSpace + Koha + SIS en 1 query) | LlamaIndex FunctionAgent |
+| 1 | MCP server del Hub (datos publicos) | FastMCP / fastapi-mcp |
+| 1+ | Estado persistente, workflows complejos | LangGraph (si se necesita) |
+| 2 | Multi-agente con handoff | LlamaIndex AgentWorkflow o LangGraph |
+
+No usar en Fase 0: LangGraph, CrewAI, AutoGen (complejidad innecesaria para 1 desarrollador).
+
+### Arquitectura de identidad
+
+**Problema:** Cada universidad tiene infra distinta (AD, LDAP, Azure Entra ID, Google WS, bases de datos custom, o nada).
+
+**Solucion por fases:**
+
+| Fase | Componente | Rol |
+|------|-----------|-----|
+| 0 | **Keycloak** solo | SSO via OIDC. Federa con AD/LDAP o broker de Google/Entra ID |
+| 1+ | **midPoint + Keycloak** | midPoint sincroniza fuentes heterogeneas y crea usuario canonico. Keycloak emite tokens |
+
+**midPoint como estandarizador:** Absorbe la heterogeneidad de cada universidad. GUIA Node siempre consulta la misma API de midPoint, sin importar si detras hay AD, Google o un SIS en Oracle.
+
+**Interfaz de identidad abstracta:**
+```python
+class IdentityConnector(GUIAConnector):
+    def get_user_info(self, user_id: str) -> dict: ...
+    def get_user_roles(self, user_id: str) -> list[str]: ...
+
+class KeycloakDirectConnector(IdentityConnector):
+    """Fase 0: consulta Keycloak Admin API"""
+
+class MidPointConnector(IdentityConnector):
+    """Fase 1+: consulta midPoint REST API (usuario canonico)"""
+```
+
+### Que NO se usa y por que
+
+| Descartado | Razon |
+|-----------|-------|
+| Onyx (ex Danswer) | Competidor directo, 20 contenedores, 8GB+ RAM |
+| RAGFlow | Stack pesado (Go + Elasticsearch), harvesting manual |
+| AnythingLLM | Node.js, orientado a uso personal |
+| Open WebUI | Frontend de LLMs, no plataforma RAG |
+| LangChain (como RAG) | LlamaIndex es mas eficiente para RAG puro |
+| ClustPy | Libreria de clustering academico, sin relevancia para GUIA |
+| MiroFish | Simulador social, AGPL incompatible con open-core |
+| Zitadel | AGPL desde 2025, incompatible con SaaS |
+| FreeIPA | Invasivo, solo Linux, no multi-tenant |
+
+---
+
 ## Arquitectura tecnica
 
-### GUIA Node (por universidad)
-
-```
-┌─────────────────────────────────────────────┐
-│              GUIA Node                      │
-│                                             │
-│  ┌─────────────────────────────────────┐    │
-│  │  Capa 1: Research (core, OSS)       │    │
-│  │  - DSpace connector (OAI-PMH)       │    │
-│  │  - OJS connector (OAI-PMH)          │    │
-│  │  - GROBID (full-text PDF)           │    │
-│  │  - Embeddings + pgvector            │    │
-│  │  - RAG engine                       │    │
-│  └─────────────────────────────────────┘    │
-│                                             │
-│  ┌─────────────────────────────────────┐    │
-│  │  Capa 2: Campus (conectores, pago)  │    │
-│  │  - Koha (prestamos, deudas)         │    │
-│  │  - SIS (matricula, notas)           │    │
-│  │  - ERP (estado de cuenta)           │    │
-│  │  - AD/LDAP (usuario, correo)        │    │
-│  │  - Moodle (tareas, cursos)          │    │
-│  └─────────────────────────────────────┘    │
-│                                             │
-│  Motor: pgvector + RAG + LLM               │
-│  Canales: Chat web · Telegram · WhatsApp    │
-│  API: REST + MCP server                     │
-└─────────────────────────────────────────────┘
-         │
-         │ Solo Capa 1 federa hacia arriba
-         ▼
-┌─────────────────────────────────────────────┐
-│              GUIA Hub                       │
-│  (por consorcio / red / pais)               │
-│  - Solo datos publicos de investigacion     │
-│  - OAI-PMH para redes nacionales            │
-│  - MCP server publico                       │
-└─────────────────────────────────────────────┘
-```
+Diagramas detallados en `docs/arquitectura.md` (Mermaid, renderizados en MkDocs).
 
 ### Interfaz de conectores
 
@@ -193,22 +266,19 @@ class GUIAConnector:
 ## Archivos del proyecto
 
 ```
-~/proyectos/upeu/ariel/   (pendiente renombrar a guia/)
-├── CLAUDE.md                  <- este archivo
+~/proyectos/sciback/guia/
+├── CLAUDE.md                  <- este archivo (fuente de verdad del proyecto)
 ├── landing.html               <- landing page del producto
 ├── mkdocs.yml                 <- config MkDocs Material bilingue ES/EN
 ├── requirements.txt
 ├── docs/
 │   ├── index.md               <- que es GUIA, para quien
-│   ├── arquitectura.md        <- Node + Hub + conectores
-│   ├── quickstart.md          <- "levanta tu Node en 15 min"
+│   ├── arquitectura.md        <- diagramas Mermaid detallados (Node, Hub, identidad, agentes)
 │   ├── modelo-comercial.md    <- tiers, precios, comparacion
-│   ├── conectores/
-│   │   ├── dspace.md
-│   │   ├── ojs.md
-│   │   ├── koha.md
-│   │   └── moodle.md
-│   └── en/                    <- version en ingles
+│   ├── conectores.md          <- interfaz GUIAConnector + conectores disponibles
+│   ├── roadmap.md             <- fases de desarrollo
+│   └── en/
+│       └── index.md           <- version en ingles
 └── .github/workflows/
     └── deploy.yml             <- build MkDocs -> landing -> deploy
 ```

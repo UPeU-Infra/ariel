@@ -1,135 +1,437 @@
 # Arquitectura
 
-## GUIA Node — por universidad
+## Modelo de despliegue: Hibrido
 
-Cada universidad instala un GUIA Node que conecta sus sistemas locales y expone un chat unificado.
+GUIA no es SaaS puro ni self-hosted puro. Cada capa tiene su modelo de despliegue segun la sensibilidad de los datos.
 
 ```mermaid
-graph TD
+graph TB
+    subgraph saas["SaaS — Gestionado por SciBack"]
+        HUB["GUIA Hub\nDatos publicos de investigacion"]
+    end
+
+    subgraph managed["Self-hosted o SciBack-managed — Por universidad"]
+        NODE_A["GUIA Node\nUniversidad A"]
+        NODE_B["GUIA Node\nUniversidad B"]
+        NODE_C["GUIA Node\nUniversidad C"]
+    end
+
+    NODE_A -->|"Solo Capa 1\n(investigacion publica)"| HUB
+    NODE_B -->|"Solo Capa 1"| HUB
+    NODE_C -->|"Solo Capa 1"| HUB
+
+    style saas fill:#1a4a2a,color:#fff
+    style managed fill:#0d1b3e,color:#fff
+    style HUB fill:#1e3a5f,color:#fff,stroke:#f39c12,stroke-width:3px
+```
+
+| Componente | Modelo | Razon |
+|-----------|--------|-------|
+| **GUIA Node** | Self-hosted o SciBack-managed | Datos sensibles (notas, deudas). Necesita acceso a red interna (AD, SIS) |
+| **GUIA Hub** | SaaS (gestionado por SciBack) | Solo datos publicos. Un Hub central para N universidades |
+| **Keycloak** | Co-desplegado con el Node | Cada universidad tiene su realm |
+| **midPoint** | Opcional, co-desplegado | Solo para universidades con infra compleja |
+
+---
+
+## GUIA Node — Arquitectura completa
+
+```mermaid
+graph TB
+    subgraph usuarios["Usuarios"]
+        EST["Estudiante"]
+        DOC["Docente"]
+        BIB["Bibliotecario"]
+        ADM["Administrativo"]
+    end
+
     subgraph canales["Canales de chat"]
-        WEB["Chat web\n(widget embebible)"]
-        TG["Telegram bot"]
+        WEB["Chat web\nChainlit (Fase 0)\nReact widget (Fase 1+)"]
+        TG["Telegram bot\naiogram"]
         WA["WhatsApp\nBusiness API"]
         TEAMS["Microsoft Teams"]
     end
 
-    subgraph node["GUIA Node"]
-        RAG["RAG Engine\npgvector + LLM"]
-        subgraph capa1["Capa 1: Research (OSS)"]
-            DS["DSpace\nOAI-PMH"]
-            OJS2["OJS\nOAI-PMH"]
+    subgraph auth["Autenticacion"]
+        KC["Keycloak\nOIDC Provider\n1 realm por universidad"]
+    end
+
+    subgraph core["GUIA Node Core"]
+        API["FastAPI\nREST + WebSocket"]
+        AGENT["LlamaIndex FunctionAgent\nOrquesta tools segun la query"]
+
+        subgraph tools["Tools del agente"]
+            T_DS["QueryEngineTool\nDSpace (pgvector)"]
+            T_OJS["QueryEngineTool\nOJS (pgvector)"]
+            T_KOHA["FunctionTool\nKoha"]
+            T_SIS["FunctionTool\nSIS"]
+            T_ERP["FunctionTool\nERP"]
+            T_MOODLE["FunctionTool\nMoodle"]
+        end
+
+        subgraph data["Data pipeline"]
+            HARVEST["Harvester\nsickle (OAI-PMH)"]
             GROBID2["GROBID\nfull-text PDF"]
+            EMBED["LlamaIndex\nchunking + embeddings"]
         end
-        subgraph capa2["Capa 2: Campus (pago)"]
-            KOHA["Koha\nSIP2 / API"]
-            SIS["SIS\nAPI"]
-            ERP["ERP\nAPI"]
-            LDAP["AD/LDAP"]
-            MOODLE["Moodle\nAPI"]
-        end
+
+        PG["PostgreSQL\npgvector + metadatos"]
+        LLM["Claude API\n(o Ollama local)"]
     end
 
-    subgraph api["APIs"]
-        REST["API REST"]
-        MCP["MCP Server"]
+    subgraph apis["APIs externas"]
+        REST["API REST\npara integraciones"]
+        MCP_S["MCP Server\npara agentes AI"]
+        DASH["Dashboard\nStreamlit + Plotly"]
     end
 
-    canales --> RAG
-    capa1 --> RAG
-    capa2 --> RAG
-    RAG --> api
+    usuarios --> canales
+    canales -->|OIDC token| auth
+    auth -->|JWT validado| API
+    API --> AGENT
+    AGENT --> tools
+    AGENT --> LLM
+    T_DS & T_OJS --> PG
+    HARVEST --> GROBID2 --> EMBED --> PG
+    API --> apis
 
-    style node fill:#0d1b3e,color:#fff
-    style capa1 fill:#1a4a2a,color:#fff
-    style capa2 fill:#4a1a1a,color:#fff
-    style RAG fill:#1e3a5f,color:#fff,stroke:#f39c12,stroke-width:2px
+    style core fill:#0d1b3e,color:#fff
+    style tools fill:#1a4a2a,color:#fff
+    style data fill:#2d1a4a,color:#fff
+    style auth fill:#4a3a1a,color:#fff
+    style AGENT fill:#1e3a5f,color:#fff,stroke:#f39c12,stroke-width:2px
+    style PG fill:#1e3a5f,color:#fff,stroke:#e74c3c,stroke-width:2px
 ```
 
 ---
 
-## Stack tecnico
+## Stack tecnico del Node
 
-| Componente | Tecnologia | Notas |
-|-----------|-----------|-------|
-| Harvester | Python + pyoaiharvest | Cosecha OAI-PMH cada 24h |
-| Full-text | GROBID | Extrae texto de PDFs cientificos |
-| Embeddings | pgvector (PostgreSQL) | Vectores para busqueda semantica |
-| RAG | LangChain / LlamaIndex | Orquestacion de retrieval + generacion |
-| LLM | Claude API / Ollama local | Segun presupuesto del cliente |
-| Chat web | Widget JS embebible | <script> tag en cualquier pagina |
-| Telegram | python-telegram-bot | Gratis, sin costo de API |
-| WhatsApp | WhatsApp Business API | Requiere cuenta Meta Business verificada |
-| Deploy | Docker Compose | Un solo `docker compose up` |
-
----
-
-## Interfaz de conectores
-
-Cada conector implementa una interfaz estandar:
-
-```python
-class GUIAConnector:
-    """Interfaz base para conectores GUIA."""
-
-    def search(self, query: str, user_context: dict) -> list[Result]:
-        """Busqueda semantica sobre el sistema conectado."""
-        ...
-
-    def get_user_info(self, user_id: str) -> dict:
-        """Info personalizada del usuario (prestamos, notas, deudas)."""
-        ...
-
-    def get_status(self, user_id: str, entity: str) -> dict:
-        """Estado de un proceso (tesis, articulo, pago)."""
-        ...
-```
-
-Esto permite que cualquier desarrollador cree conectores nuevos para sistemas no cubiertos.
+| Componente | Tecnologia | Licencia | Para que |
+|-----------|-----------|----------|----------|
+| RAG engine | LlamaIndex (FunctionAgent) | MIT | Chunking, embeddings, reranking, tool calling |
+| OAI-PMH | sickle | BSD | Harvesting DSpace/OJS |
+| PDF full-text | GROBID + grobid-client-python | Apache 2.0 | Extraccion de texto de papers |
+| Vector store | pgvector (PostgreSQL) | MIT | Embeddings + busqueda semantica |
+| API | FastAPI | MIT | REST + WebSocket, async |
+| Chat web | Chainlit (Fase 0) / React (Fase 1+) | Apache 2.0 | Interfaz de chat |
+| Telegram | aiogram | MIT | Bot gratis |
+| Dashboard | Streamlit + Plotly | MIT | Visualizacion produccion cientifica |
+| SSO | Keycloak | Apache 2.0 | OIDC, multi-tenant por realms |
+| IGA | midPoint (Fase 1+) | EUPL | Usuario canonico multi-fuente |
+| LLM | Claude API / Ollama | — | Generacion de respuestas |
+| Deploy | Docker Compose | — | Un solo `docker compose up` |
 
 ---
 
-## GUIA Hub — por consorcio/red
-
-El Hub agrega multiples Nodes para busqueda federada de investigacion.
+## Docker Compose — Servicios del Node
 
 ```mermaid
-graph TD
-    subgraph nodes["GUIA Nodes"]
-        N1["Node Universidad A\nDSpace + OJS + Koha"]
-        N2["Node Universidad B\nDSpace + Moodle"]
-        N3["Node Universidad C\nOJS + SIS"]
+graph LR
+    subgraph compose["docker-compose.yml"]
+        NG["nginx\nreverse proxy\nSSL termination"]
+        API2["guia-api\nFastAPI + LlamaIndex"]
+        CH["guia-chat\nChainlit"]
+        TG2["guia-telegram\naiogram bot"]
+        HV["guia-harvester\nsickle + GROBID client"]
+        GR["grobid\nfull-text extraction"]
+        PG2["postgres\npgvector extension"]
+        KC2["keycloak\nOIDC provider"]
+        DS2["streamlit-dash\nanalytics"]
     end
 
-    HUB["GUIA Hub\nFederation Broker"]
+    NG --> API2
+    NG --> CH
+    NG --> KC2
+    NG --> DS2
+    API2 --> PG2
+    API2 --> KC2
+    CH --> API2
+    TG2 --> API2
+    HV --> GR
+    HV --> PG2
 
-    subgraph upstream["Redes y agregadores"]
-        LA["LA Referencia"]
-        OA["OpenAIRE"]
-        OALEX["OpenAlex"]
-        BASE2["BASE / CORE"]
-    end
-
-    N1 -->|"Solo Capa 1\n(investigacion)"| HUB
-    N2 -->|"Solo Capa 1"| HUB
-    N3 -->|"Solo Capa 1"| HUB
-    HUB -->|OAI-PMH| upstream
-
-    style HUB fill:#1e3a5f,color:#fff,stroke:#f39c12,stroke-width:3px
-    style nodes fill:#1a4a2a,color:#fff
+    style compose fill:#0d1b3e,color:#fff
+    style PG2 fill:#1e3a5f,color:#fff,stroke:#e74c3c,stroke-width:2px
+    style API2 fill:#1e3a5f,color:#fff,stroke:#f39c12,stroke-width:2px
 ```
-
-**Funciones del Hub:**
-- Federation broker: resuelve queries que un nodo local no puede
-- Embeddings agregados de todos los nodos miembro
-- OAI-PMH endpoint para compatibilidad con redes nacionales
-- MCP server publico (corpus completo accesible desde agentes AI)
-- Dashboard de visibilidad y analiticas
 
 ---
 
-## Infraestructura (AWS)
+## Arquitectura de identidad
 
-Para el piloto UPeU:
+### Fase 0 — Keycloak solo (1 universidad, 1 fuente)
+
+```mermaid
+graph LR
+    subgraph univ["Red interna universidad"]
+        AD["Active Directory\no LDAP"]
+        GOOGLE["Google Workspace\n(@univ.edu.pe)"]
+        SIS_DB["SIS Database\n(si no hay AD)"]
+    end
+
+    KC3["Keycloak\nrealm: universidad-x"]
+
+    subgraph guia["GUIA Node"]
+        API3["FastAPI"]
+        AGENT3["FunctionAgent"]
+    end
+
+    AD -->|"LDAP User\nFederation"| KC3
+    GOOGLE -->|"OIDC Identity\nBrokering"| KC3
+    SIS_DB -->|"Custom User\nStorage SPI"| KC3
+    KC3 -->|"JWT tokens\n(roles, atributos)"| API3
+    API3 --> AGENT3
+
+    style KC3 fill:#4a3a1a,color:#fff,stroke:#f39c12,stroke-width:2px
+    style guia fill:#0d1b3e,color:#fff
+```
+
+Keycloak maneja 3 escenarios comunes de universidades LATAM:
+
+- **Tiene AD/LDAP:** User Federation directo
+- **Tiene Google Workspace:** OIDC Identity Brokering (login con cuenta Google institucional)
+- **Solo tiene base de datos:** Custom User Storage SPI o usuarios manuales en Keycloak
+
+---
+
+### Fase 1+ — midPoint + Keycloak (multiples fuentes heterogeneas)
+
+```mermaid
+graph TB
+    subgraph fuentes["Fuentes de identidad de la universidad"]
+        AD2["Active Directory\nOn-premise"]
+        ENTRA["Azure Entra ID\nCloud"]
+        SIS2["SIS\nOracle / MySQL"]
+        GOOGLE2["Google\nWorkspace"]
+        KOHA2["Koha\nPatron DB"]
+    end
+
+    subgraph midpoint["midPoint (IGA)"]
+        SYNC["ConnId Connectors\nSync bidireccional"]
+        CANON["Usuario canonico\nCorrelacion por DNI/email"]
+        RBAC["Roles dinamicos\nestudiante, docente, egresado"]
+        LIFECYCLE["Lifecycle\nJoiner-Mover-Leaver"]
+        MP_API["REST API\n/ws/rest/users/"]
+    end
+
+    subgraph auth2["Autenticacion"]
+        KC4["Keycloak\nOIDC Provider"]
+    end
+
+    subgraph guia2["GUIA Node"]
+        IDENTITY["IdentityConnector\n(MidPointConnector)"]
+        AGENT4["FunctionAgent"]
+    end
+
+    fuentes --> SYNC
+    SYNC --> CANON --> RBAC --> LIFECYCLE
+    LIFECYCLE -->|"Provisioning\n(connector-keycloak)"| KC4
+    MP_API --> IDENTITY
+    KC4 -->|JWT tokens| AGENT4
+    IDENTITY --> AGENT4
+
+    style midpoint fill:#2d1a4a,color:#fff
+    style CANON fill:#1e3a5f,color:#fff,stroke:#f39c12,stroke-width:2px
+    style KC4 fill:#4a3a1a,color:#fff,stroke:#f39c12,stroke-width:2px
+```
+
+**Flujo:**
+
+1. midPoint sincroniza identidades de todas las fuentes via ConnId
+2. Crea un **usuario canonico** con reglas de correlacion (DNI, email)
+3. Asigna **roles dinamicos** (estudiante activo, docente TC, egresado)
+4. **Provisiona** el usuario en Keycloak via connector-keycloak
+5. Keycloak emite **tokens OIDC** con roles y atributos
+6. GUIA Node consulta **midPoint REST API** para atributos detallados
+
+**Beneficio clave:** El codigo de GUIA Node es identico en todas las universidades. midPoint absorbe toda la heterogeneidad.
+
+---
+
+### Conector de identidad abstracto
+
+```mermaid
+classDiagram
+    class GUIAConnector {
+        <<interface>>
+        +search(query, user_context) list~Result~
+        +get_user_info(user_id) dict
+        +get_status(user_id, entity) dict
+    }
+
+    class IdentityConnector {
+        <<interface>>
+        +get_user_info(user_id) dict
+        +get_user_roles(user_id) list~str~
+        +is_active(user_id) bool
+    }
+
+    class KeycloakDirectConnector {
+        -keycloak_admin: KeycloakAdmin
+        +get_user_info(user_id) dict
+        +get_user_roles(user_id) list~str~
+    }
+
+    class MidPointConnector {
+        -midpoint_url: str
+        -midpoint_auth: str
+        +get_user_info(user_id) dict
+        +get_user_roles(user_id) list~str~
+    }
+
+    class DSpaceConnector {
+        +search(query, user_context) list~Result~
+    }
+
+    class KohaConnector {
+        +get_user_info(user_id) dict
+        +get_status(user_id, entity) dict
+    }
+
+    GUIAConnector <|-- IdentityConnector
+    GUIAConnector <|-- DSpaceConnector
+    GUIAConnector <|-- KohaConnector
+    IdentityConnector <|.. KeycloakDirectConnector
+    IdentityConnector <|.. MidPointConnector
+```
+
+---
+
+## Arquitectura de agentes
+
+### Fase 0: RAG simple → Fase 0.5: FunctionAgent con tools
+
+```mermaid
+graph TB
+    USER["Usuario: Puedo graduarme\neste semestre?"]
+
+    subgraph agent["LlamaIndex FunctionAgent"]
+        PLAN["Planificacion\n(Claude decide que tools llamar)"]
+
+        subgraph tools2["Tools disponibles"]
+            T1["QueryEngineTool\nDSpace pgvector\n'Buscar reglamento\nde grados'"]
+            T2["FunctionTool\nSIS.get_credits\n'180/180 completos'"]
+            T3["FunctionTool\nKoha.get_debts\n'0 deudas biblioteca'"]
+            T4["FunctionTool\nERP.get_payments\n'0 pendientes'"]
+            T5["FunctionTool\nDSpace.get_thesis_status\n'Aprobada 2025-12-01'"]
+        end
+
+        SYNTH["Sintesis\nSi, cumples todos\nlos requisitos..."]
+    end
+
+    USER --> PLAN
+    PLAN --> T1 & T2 & T3 & T4 & T5
+    T1 & T2 & T3 & T4 & T5 --> SYNTH
+
+    style agent fill:#0d1b3e,color:#fff
+    style PLAN fill:#1e3a5f,color:#fff,stroke:#f39c12,stroke-width:2px
+    style SYNTH fill:#1a4a2a,color:#fff
+```
+
+### Ruta de escalado de agentes
+
+```mermaid
+graph LR
+    F0["Fase 0\nRAG simple\nLlamaIndex\n+ pgvector"]
+    F05["Fase 0.5\nFunctionAgent\n3-4 tools\n(DSpace+Koha+SIS)"]
+    F1["Fase 1\nMCP Server\nfastapi-mcp\n(datos publicos)"]
+    F2["Fase 2\nMulti-agente\nAgentWorkflow\no LangGraph"]
+
+    F0 -->|"Agregar tools\nal agente"| F05
+    F05 -->|"Exponer\ncomo MCP"| F1
+    F1 -->|"Orquestacion\ncompleja"| F2
+
+    style F0 fill:#1a4a2a,color:#fff
+    style F05 fill:#1e3a5f,color:#fff
+    style F1 fill:#4a3a1a,color:#fff
+    style F2 fill:#2d1a4a,color:#fff
+```
+
+---
+
+## GUIA Hub — Federacion
+
+```mermaid
+graph TB
+    subgraph nodes["GUIA Nodes (self-hosted por universidad)"]
+        N1["Node UPeU\nLima, Peru"]
+        N2["Node UNASP\nSao Paulo, Brasil"]
+        N3["Node UNACh\nChillan, Chile"]
+        N4["Node Univ. Adventista\nMedellin, Colombia"]
+    end
+
+    subgraph hub["GUIA Hub — SaaS SciBack"]
+        FED["Federation Broker\nResuelve queries\ncross-universidad"]
+        AGG["Embeddings\nagregados"]
+        OAI["OAI-PMH\nendpoint"]
+        MCP_HUB["MCP Server\npublico"]
+        DASH_HUB["Dashboard\nanalyticas por red"]
+    end
+
+    subgraph upstream["Redes nacionales y globales"]
+        ALICIA["ALICIA\n(Peru)"]
+        LAREF["LA Referencia\n(LATAM)"]
+        OAIRE["OpenAIRE"]
+        OALEX["OpenAlex"]
+    end
+
+    subgraph agents["Agentes AI externos"]
+        CLAUDE["Claude Desktop"]
+        GPT["ChatGPT"]
+        CURSOR["Cursor / IDE"]
+    end
+
+    N1 -->|"Solo Capa 1\n(datos publicos)"| FED
+    N2 -->|"Solo Capa 1"| FED
+    N3 -->|"Solo Capa 1"| FED
+    N4 -->|"Solo Capa 1"| FED
+
+    FED --> AGG
+    FED --> OAI
+    FED --> MCP_HUB
+    FED --> DASH_HUB
+
+    OAI --> upstream
+    MCP_HUB --> agents
+
+    style hub fill:#1a4a2a,color:#fff
+    style FED fill:#1e3a5f,color:#fff,stroke:#f39c12,stroke-width:3px
+    style nodes fill:#0d1b3e,color:#fff
+```
+
+**Datos que fluyen al Hub:** Solo Capa 1 (investigacion publica): metadatos Dublin Core, abstracts, full-text de acceso abierto.
+
+**Datos que NUNCA salen del Node:** Capa 2 (campus): notas, deudas, matricula, prestamos, credenciales.
+
+---
+
+## Notificaciones proactivas (Fase 0.5)
+
+```mermaid
+sequenceDiagram
+    participant CRON as APScheduler (8am diario)
+    participant KOHA as Koha API
+    participant SIS as SIS API
+    participant TPL as Template Engine
+    participant TG as Telegram Bot
+    participant USER as Estudiante
+
+    CRON->>KOHA: get_loans_due_in(days=3)
+    KOHA-->>CRON: [{user: jperez, book: "Metodologia...", due: 2026-04-07}]
+    CRON->>SIS: get_thesis_deadlines(days=7)
+    SIS-->>CRON: [{user: jperez, deadline: 2026-04-11, stage: "revision"}]
+    CRON->>TPL: render_reminder(user, events)
+    TPL-->>CRON: "Hola Juan, tienes 1 libro por vencer y tu revision de tesis es en 7 dias"
+    CRON->>TG: send_message(jperez_telegram_id, message)
+    TG->>USER: Push notification
+```
+
+En Fase 0.5 las notificaciones usan templates sin LLM. En Fase 1+ el LLM personaliza ("vi que tu tesis es sobre X, hay 3 nuevos articulos en OJS que podrian ser utiles").
+
+---
+
+## Infraestructura AWS — Node piloto UPeU
 
 | Servicio | Especificacion | Costo estimado |
 |---------|---------------|----------------|
@@ -141,6 +443,8 @@ Para el piloto UPeU:
 
 Deploy: Docker Compose con Nginx reverse proxy + SSL (Let's Encrypt).
 
+Servicios en el compose: nginx, guia-api (FastAPI), guia-chat (Chainlit), guia-telegram (aiogram), guia-harvester (sickle), grobid, postgres (pgvector), keycloak, streamlit-dash.
+
 ---
 
 ## Fases de desarrollo
@@ -150,21 +454,27 @@ timeline
     title GUIA — Hoja de ruta
     section 2026
         Q2-Q3 : Fase 0 — Node piloto UPeU
-               : DSpace + OJS + Koha
-               : Chat web + Telegram
-               : RAG basico funcionando
+               : DSpace + OJS harvesting (sickle + GROBID)
+               : RAG con LlamaIndex + pgvector
+               : Chat web (Chainlit) + Telegram (aiogram)
+               : Keycloak SSO basico
+               : Dashboard Streamlit
         Q4 : Fase 1 — Node empaquetado
-            : Docker Compose listo
-            : 2-3 universidades piloto
-            : Primeros clientes SciBack
+            : Docker Compose listo para N universidades
+            : FunctionAgent con tools (DSpace + Koha + SIS)
+            : MCP Server del Hub (datos publicos)
+            : React widget embebible
+            : midPoint para clientes con infra compleja
     section 2027
-        H1 : Fase 2 — Hub piloto
-            : Federacion de nodos
-            : OAI-PMH hacia redes nacionales
+        H1 : Fase 2 — Hub federado
+            : Federacion de nodos (solo Capa 1)
+            : OAI-PMH hacia ALICIA / LA Referencia
             : Conectores SIS y ERP
+            : Multi-agente con handoff
         H2 : Escala LATAM
             : 10+ universidades
             : WhatsApp Business API
+            : Metabase para analytics
     section 2028+
         Todo el ano : Fase 3 — Hub escalado
                     : MCP server publico
