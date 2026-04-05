@@ -164,18 +164,34 @@ No es 100% SaaS ni 100% on-premise. Cada capa tiene su modelo:
 
 | Componente | Tecnologia | Licencia | Justificacion |
 |-----------|-----------|----------|---------------|
-| RAG engine | **LlamaIndex** (FunctionAgent + pgvector) | MIT | Mejor framework Python para RAG en produccion. Chunking, embeddings, reranking, hybrid search |
-| OAI-PMH harvester | **sickle** | BSD | Harvesting de DSpace/OJS. Probado, ligero |
-| PDF full-text | **GROBID** + grobid-client-python | Apache 2.0 | Estandar para papers academicos |
+| RAG engine | **LlamaIndex** (FunctionAgent + pgvector) | MIT | Mejor framework Python para RAG en produccion |
+| OAI-PMH harvester | **oaipmh-scythe** (fork moderno de sickle) | BSD | v1.0.0 sept 2025, async, type hints |
+| DSpace REST API | **dspace-rest-client** | BSD | v0.1.13, DSpace 7+ CRUD completo |
+| PDF academicos | **GROBID** + grobid-client-python | Apache 2.0 | Gold standard para papers. F1 mas alto en benchmarks |
+| PDF genericos | **Docling** (IBM) | MIT | Estructura semantica, tablas, nativo en LlamaIndex |
+| Embeddings | **intfloat/multilingual-e5-large-instruct** | MIT | Top MTEB multilingue, excelente en espanol academico, local, gratis |
 | Vector store | **pgvector** (extension PostgreSQL) | MIT | Sin infraestructura adicional — usa el mismo Postgres |
-| API | **FastAPI** | MIT | REST + WebSocket. Async nativo |
-| Chat web (Fase 0) | **Chainlit** | Apache 2.0 | Chat funcional en 20 lineas Python |
+| API | **FastAPI** | MIT | ASGI async, OpenAPI nativo, 15K+ req/s |
+| Chat web (Fase 0) | **Chainlit** | Apache 2.0 | Nativo LlamaIndex, auth OIDC, streaming |
 | Chat web (Fase 1+) | **React** widget embebible | — | Cuando necesitemos UI custom con branding por universidad |
-| Telegram bot | **aiogram** | MIT | Async, bien mantenido |
+| Telegram bot | **aiogram** v3 | MIT | 100% async, FSM para conversaciones con estado |
+| WhatsApp (Fase 1+) | **pywa** | MIT | Cloud API oficial Meta, FastAPI webhook nativo |
 | Dashboard | **Streamlit + Plotly** (Fase 0) → **Metabase** (Fase 1+) | MIT / AGPL | Visualizacion de produccion cientifica |
-| SSO/Auth | **Keycloak** | Apache 2.0 | OIDC provider, multi-tenant por realms |
+| SSO/Auth | **Keycloak** + authlib + fastapi-keycloak-middleware + PyJWT | Apache 2.0 | OIDC, multi-tenant por realms |
 | IGA (Fase 1+) | **midPoint** | EUPL | Usuario canonico multi-fuente, lifecycle, gobernanza |
+| Dep. management | **uv** (Astral) | MIT | 10-100x mas rapido que pip, Docker-friendly, lockfile universal |
 | Deploy | **Docker Compose** | — | Un solo `docker compose up` |
+
+### Boilerplates de referencia
+- **stevereiner/flexible-graphrag** — FastAPI + LlamaIndex + pgvector + MCP Server + Docker Compose + monitoring (Apache 2.0)
+- **pmaske-aihub/rag-application** — LlamaIndex + pgvector + FastAPI minimal (punto de partida mas limpio)
+- **create-llama** (`npx create-llama@latest`) — Scaffolding oficial de LlamaIndex
+
+### Lo que SI hay que construir desde cero
+1. `OAIPMHReader` para LlamaIndex (no existe en llamahub) — potencialmente publicable
+2. Conector Koha SIP2/REST — no hay libreria Python mantenida
+3. Servidor OAI-PMH en FastAPI para el Hub — ~500 lineas, protocolo simple
+4. Validador ALICIA/RENATI — CONCYTEC no ha publicado herramientas Python
 
 ### Por que Python (y no otra cosa)
 
@@ -236,7 +252,7 @@ class MidPointConnector(IdentityConnector):
 | 7 | schema.org / JSON-LD | SI | 1 | Exponer en HTML del Hub | Baja |
 | 8 | DataCite | PARCIAL | 2 | Consumir (DOI, ORCID ya en modelo) | Media |
 | 9 | DRIVER Guidelines | NO | — | Solo tabla traduccion DRIVER→COAR | — |
-| 10 | CERIF | NO | 3+ | Solo si cliente tiene DSpace-CRIS | Alta |
+| 10 | CERIF | SI | 1+ (Person) / 2 (full) | DSpace-CRIS entidades: Person, Project, Patent, Equipment | Media |
 | 11 | VIVO | NO | — | Usar ORCID API en su lugar | Alta |
 | 12 | MODS / METS | NO | — | Overkill para RAG | Alta |
 | 13 | ETD-MS | PARCIAL | 0 | Ya cubierto por campos RENATI | Baja |

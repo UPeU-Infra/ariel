@@ -292,11 +292,202 @@ sequenceDiagram
 
 ---
 
+## CERIF y DSpace-CRIS — Inteligencia de investigacion
+
+CERIF es relevante para GUIA cuando la universidad tiene **DSpace-CRIS** (no DSpace plain). Permite responder preguntas como:
+
+- "¿Este autor tiene patentes nacidas de su investigacion?"
+- "¿Que proyectos tiene el Dr. X activos?"
+- "¿Que equipamiento de laboratorio hay disponible para investigacion en Y?"
+- "¿Que organizaciones financiaron investigacion sobre Z?"
+
+### Entidades CERIF
+
+```mermaid
+graph TB
+    subgraph core["Actores (Tier 1)"]
+        PERS["Person\nInvestigador, docente"]
+        ORG["OrgUnit\nDepartamento, facultad"]
+        PROJ["Project\nProyecto de investigacion"]
+    end
+
+    subgraph results["Resultados (Tier 2)"]
+        PUB["Publication\nArticulo, tesis, libro"]
+        PAT["Patent\nPropiedad intelectual"]
+        PROD["Product\nDataset, software"]
+    end
+
+    subgraph env["Entorno (Tier 3)"]
+        FUND["Funding\nFuente de financiamiento"]
+        EQUIP["Equipment\nEquipamiento de lab"]
+        EVENT["Event\nCongreso, seminario"]
+    end
+
+    PERS -->|"isAuthorOf"| PUB
+    PERS -->|"isMemberOf"| ORG
+    PERS -->|"isLeaderOf"| PROJ
+    PROJ -->|"hasResult"| PAT
+    PROJ -->|"hasResult"| PUB
+    PROJ -->|"usesEquipment"| EQUIP
+    FUND -->|"supports"| PROJ
+    ORG -->|"funds"| PROJ
+
+    style core fill:#1a4a2a,color:#fff
+    style results fill:#1e3a5f,color:#fff
+    style env fill:#4a3a1a,color:#fff
+```
+
+### DSpace-CRIS: como expone CERIF
+
+DSpace-CRIS (mantenido por 4Science, v9 actual) almacena entidades CERIF como Items DSpace con `dspace.entity.type` y relaciones en tabla separada.
+
+**REST API:**
+```
+GET /server/api/discover/search/objects?f.entityType=Person,equals
+GET /server/api/discover/search/objects?f.entityType=Patent,equals
+GET /server/api/core/items/{uuid}/relationships
+```
+
+**OAI-PMH CERIF (endpoint dedicado):**
+```
+Base URL: https://{dspace-cris}/oai/openairecris
+Prefix:   oai_cerif_openaire
+Sets:     openaire_cris_persons, openaire_cris_patents,
+          openaire_cris_projects, openaire_cris_orgunits,
+          openaire_cris_equipments, openaire_cris_events
+```
+
+### Modelo interno para entidades CRIS
+
+```sql
+-- Entidades CERIF (Person, Project, Patent, Equipment, etc.)
+CREATE TABLE cris_entity (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    source_id       TEXT NOT NULL,          -- DSpace item UUID
+    entity_type     TEXT NOT NULL,          -- 'Person', 'Project', 'Patent', etc.
+    label           TEXT NOT NULL,          -- display name
+    metadata        JSONB NOT NULL,         -- all metadata fields as-is
+    text_content    TEXT,                   -- flattened text for embedding
+    embedding       VECTOR(1536),           -- pgvector embedding
+    source_url      TEXT,
+    harvested_at    TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Relaciones entre entidades (grafo en PostgreSQL, sin Neo4j)
+CREATE TABLE cris_relationship (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    from_id         UUID REFERENCES cris_entity(id),
+    to_id           UUID REFERENCES cris_entity(id),
+    rel_type        TEXT NOT NULL,          -- 'isAuthorOfPublication', etc.
+    metadata        JSONB
+);
+
+CREATE INDEX ON cris_entity (entity_type);
+CREATE INDEX ON cris_entity USING ivfflat(embedding vector_cosine_ops);
+CREATE INDEX ON cris_relationship (from_id, rel_type);
+CREATE INDEX ON cris_relationship (to_id, rel_type);
+```
+
+### Queries de ejemplo (SQL puro, sin graph DB)
+
+```sql
+-- "¿Que patentes tiene el Dr. Sanchez?"
+SELECT e_patent.label, e_patent.metadata
+FROM cris_entity e_person
+JOIN cris_relationship r ON r.from_id = e_person.id
+JOIN cris_entity e_patent ON e_patent.id = r.to_id
+WHERE e_person.entity_type = 'Person'
+  AND e_person.label ILIKE '%Sanchez%'
+  AND r.rel_type = 'isPersonOfProject'
+-- luego project -> patent
+JOIN cris_relationship r2 ON r2.from_id = r.to_id
+JOIN cris_entity e_pat ON e_pat.id = r2.to_id
+  AND r2.rel_type = 'isPatentOfProject';
+
+-- "¿Que proyectos financia CONCYTEC?"
+SELECT e_project.label, e_project.metadata
+FROM cris_entity e_funder
+JOIN cris_relationship r ON r.to_id = e_funder.id
+JOIN cris_entity e_project ON e_project.id = r.from_id
+WHERE e_funder.label ILIKE '%CONCYTEC%'
+  AND r.rel_type = 'isProjectOfFunding';
+```
+
+### Implementacion por fases
+
+| Fase | CERIF scope | Entidades |
+|------|------------|-----------|
+| 0 | Ninguno | UPeU tiene DSpace plain, no CRIS |
+| 1 | Person + Publication | "¿Quien escribio esto?" — DSpace 7 soporta Person entities |
+| 2 | + Project + OrgUnit + Funding | Para clientes con DSpace-CRIS |
+| 2+ | + Patent + Equipment + Event | Inteligencia de investigacion completa |
+
+---
+
+## Stack de dependencias Python
+
+```mermaid
+graph TB
+    subgraph core_deps["Core"]
+        FASTAPI["FastAPI\nASGI async, OpenAPI"]
+        LLAMA["LlamaIndex\nRAG engine"]
+        PGV["pgvector\nvector store"]
+    end
+
+    subgraph harvest_deps["Harvesting"]
+        SCYTHE["oaipmh-scythe\nOAI-PMH client\n(fork moderno de sickle)"]
+        DSPACE_CLIENT["dspace-rest-client\nDSpace 7+ REST API"]
+        GROBID_C["grobid-client-python\nPDF academicos"]
+        DOCLING["Docling (IBM)\nPDF genericos"]
+    end
+
+    subgraph ai_deps["AI / Embeddings"]
+        E5["multilingual-e5-large-instruct\nTop multilingue, espanol"]
+        ST["sentence-transformers\nmodelo local, gratis"]
+        CLAUDE_API["Claude API\nLLM principal"]
+    end
+
+    subgraph chat_deps["Canales"]
+        CHAINLIT["Chainlit\nchat web, auth OIDC"]
+        AIOGRAM["aiogram v3\nTelegram async"]
+        PYWA["pywa\nWhatsApp Cloud API"]
+    end
+
+    subgraph auth_deps["Auth"]
+        AUTHLIB["authlib\nOIDC/OAuth2"]
+        KC_MW["fastapi-keycloak-middleware"]
+        PYJWT["PyJWT\ntoken validation"]
+    end
+
+    subgraph tooling["Tooling"]
+        UV["uv (Astral)\ndep management\n10-100x mas rapido que pip"]
+    end
+
+    style core_deps fill:#1a4a2a,color:#fff
+    style harvest_deps fill:#0d1b3e,color:#fff
+    style ai_deps fill:#2d1a4a,color:#fff
+    style chat_deps fill:#4a3a1a,color:#fff
+    style auth_deps fill:#4a1a1a,color:#fff
+```
+
+### Dependencias clave actualizadas
+
+| Componente | Paquete anterior | Paquete actualizado | Razon del cambio |
+|-----------|-----------------|--------------------|--------------------|
+| OAI-PMH | sickle | **oaipmh-scythe** | sickle abandonado (2023). Scythe es fork moderno con async + type hints (v1.0.0 sept 2025) |
+| JWT | python-jose | **PyJWT** | python-jose abandonado |
+| Embeddings | OpenAI ada-002 | **multilingual-e5-large-instruct** | Local, gratis, mejor en espanol, sin vendor lock-in |
+| Dep. mgmt | pip + requirements.txt | **uv** | 10-100x mas rapido, lockfile universal, Docker-friendly |
+| WhatsApp | — | **pywa** | MIT, Cloud API oficial Meta, FastAPI webhook nativo |
+| PDF genericos | — | **Docling** (IBM) | 97.9% accuracy tablas, nativo en LlamaIndex |
+
+---
+
 ## Estandares descartados y por que
 
 | Estandar | Razon de descarte | Alternativa |
 |---------|-------------------|-------------|
-| CERIF | Europeo, complejo, sin mandato en LATAM | Campos RENATI cubren el caso peruano |
 | VIVO | Perfiles de investigadores, RDF complejo, sin adopcion LATAM | ORCID API directo (Fase 2) |
 | MODS / METS | Preservacion digital, overkill para RAG | Dublin Core Qualified via `dim` |
 | DRIVER | Superado por OpenAIRE v3/v4 desde 2014 | Tabla traduccion DRIVER→COAR |
